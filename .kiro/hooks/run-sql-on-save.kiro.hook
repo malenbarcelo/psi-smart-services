@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Generate Model and Queries from SQL",
+  "description": "Al guardar un archivo .sql, el agente lee la estructura de la tabla, compara con los modelos/queries existentes y sincroniza todo (crea, actualiza o elimina archivos según corresponda).",
+  "version": "2",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "sqlScriptsAndData/*.sql"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Se guardó un archivo SQL. Realizá los siguientes pasos en orden:\n\n1. Leé el archivo .sql que se acaba de guardar y extraé los nombres de todas las tablas definidas (los CREATE TABLE).\n\n2. Listá los archivos actuales en database/models/ y src/dbQueries/.\n\n3. Compará las tablas del .sql con los modelos existentes. Detectá:\n   - Tablas nuevas que no tienen modelo → crear modelo y queries.\n   - Tablas que cambiaron de nombre (hay un modelo cuyo tableName no coincide con ninguna tabla del .sql, pero la estructura es similar) → eliminar el modelo y queries viejos, crear los nuevos con el nombre correcto.\n   - Tablas existentes con cambios en columnas, tipos, foreign keys o asociaciones → actualizar el modelo y queries.\n   - Modelos que referencian tablas que ya no existen en NINGÚN archivo .sql de sqlScriptsAndData/ → eliminar el modelo y queries.\n\n4. Verificá también las asociaciones hasMany/belongsTo en otros modelos que referenciaban al modelo viejo y actualizalas al nuevo nombre.\n\n5. Seguí el steering modelsAndQueries.md para las convenciones de nombres y estructura de archivos.\n\n6. Resumí brevemente qué archivos creaste, actualizaste o eliminaste."
+  }
+}

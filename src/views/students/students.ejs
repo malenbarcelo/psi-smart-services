@@ -1,0 +1,172 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<div class="page-content">
+  <div class="page-title-row">
+    <h1 class="page-title">Alumnos</h1>
+    <div class="page-title-actions">
+      <button class="btn btn-secondary" id="openFilterBtn">
+        <i class="fa-solid fa-filter"></i> Filtros
+      </button>
+      <button class="btn btn-primary" id="createStudentBtn">
+        <i class="fa-solid fa-plus"></i> Nuevo Alumno
+      </button>
+    </div>
+  </div>
+
+  <div class="active-filters-bar" id="activeFiltersBar" style="display: none;">
+    <span class="active-filters-text">Filtros aplicados</span>
+    <button class="btn-clear-filters" id="clearFiltersBtn">
+      <i class="fa-solid fa-xmark"></i> Quitar filtros
+    </button>
+  </div>
+
+  <div class="table-scroll-container" id="tableScrollContainer" style="--table-height: calc(100vh - 190px)">
+    <table class="std-table">
+      <colgroup>
+        <col style="width: 15%">
+        <col style="width: 15%">
+        <col style="width: 22%">
+        <col style="width: 10%">
+        <col style="width: 17%">
+        <col style="width: 8%">
+        <col style="width: 13%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="th-sortable" data-sort="last_name">Apellido <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th class="th-sortable" data-sort="first_name">Nombre <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th class="th-sortable" data-sort="email">Email <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th>DNI</th>
+          <th class="th-sortable" data-sort="company">Empresa <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="studentsTableBody">
+        <!-- rows loaded via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create/Edit Student Popup -->
+<div class="popup-overlay" id="studentPopup">
+  <div class="popup-card popup-md">
+    <div class="popup-header">
+      <h3 class="popup-title" id="studentPopupTitle">Nuevo Alumno</h3>
+      <i class="fa-solid fa-xmark popup-close" id="studentPopupClose"></i>
+    </div>
+    <div class="popup-body">
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" id="firstNameLabel">Nombre</label>
+          <input type="text" class="input-field" id="firstName" autocomplete="off">
+          <span class="input-error" id="firstNameError"></span>
+        </div>
+        <div class="input-group">
+          <label class="input-label" id="lastNameLabel">Apellido</label>
+          <input type="text" class="input-field" id="lastName" autocomplete="off">
+          <span class="input-error" id="lastNameError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" id="emailLabel">Email</label>
+          <input type="text" class="input-field" id="email" autocomplete="off">
+          <span class="input-error" id="emailError"></span>
+        </div>
+        <div class="input-group">
+          <label class="input-label" id="dniLabel">DNI</label>
+          <input type="text" class="input-field" id="dni" autocomplete="off">
+          <span class="input-error" id="dniError"></span>
+        </div>
+      </div>
+      <% if (userLogged.id_users_categories != 3) { %>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" id="studentCompanyLabel">Empresa</label>
+          <select class="input-field" id="studentCompany">
+            <option value="">Seleccionar</option>
+          </select>
+          <span class="input-error" id="studentCompanyError"></span>
+        </div>
+      </div>
+      <% } %>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="studentPopupCancel">Cancelar</button>
+      <button class="btn btn-primary" id="studentPopupSave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Popup -->
+<div class="popup-overlay" id="confirmPopup">
+  <div class="popup-card popup-sm">
+    <div class="popup-header">
+      <h3 class="popup-title" id="confirmPopupTitle">Confirmar</h3>
+      <i class="fa-solid fa-xmark popup-close" id="confirmPopupClose"></i>
+    </div>
+    <div class="popup-body">
+      <p id="confirmPopupMessage">¿Está seguro?</p>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="confirmPopupCancel">Cancelar</button>
+      <button class="btn btn-danger" id="confirmPopupAccept">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Side Panel -->
+<div class="filter-panel" id="filterPanel">
+  <div class="filter-panel-header">
+    <h3 class="filter-panel-title">Filtros</h3>
+    <i class="fa-solid fa-xmark filter-panel-close" id="filterPanelClose"></i>
+  </div>
+  <div class="filter-panel-body">
+    <div class="input-group">
+      <label class="input-label">Nombre / Apellido</label>
+      <input type="text" class="input-field" id="filterName" autocomplete="off" placeholder="Buscar por nombre...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Email</label>
+      <input type="text" class="input-field" id="filterEmail" autocomplete="off" placeholder="Buscar por email...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">DNI</label>
+      <input type="text" class="input-field" id="filterDni" autocomplete="off" placeholder="Buscar por DNI...">
+    </div>
+    <% if (userLogged.id_users_categories != 3) { %>
+    <div class="input-group" id="filterCompanyGroup">
+      <label class="input-label">Empresa</label>
+      <input type="text" class="input-field" id="filterCompany" autocomplete="off" placeholder="Buscar por empresa...">
+    </div>
+    <% } %>
+    <div class="input-group">
+      <label class="input-label">Estado</label>
+      <select class="input-field" id="filterEnabled">
+        <option value="">Todos</option>
+        <option value="1">Activo</option>
+        <option value="0">Inactivo</option>
+      </select>
+    </div>
+  </div>
+  <div class="filter-panel-footer">
+    <button class="btn btn-secondary" id="filterClearBtn">Limpiar</button>
+    <button class="btn btn-primary" id="filterApplyBtn">Aplicar</button>
+  </div>
+</div>
+<div class="filter-panel-overlay" id="filterPanelOverlay"></div>
+
+<!-- Result Popup -->
+<div class="result-popup" id="resultPopup">
+  <i class="fa-solid fa-check result-popup-icon"></i>
+  <span class="result-popup-text" id="resultPopupText">Operación exitosa</span>
+</div>
+
+<!----------SCRIPTS---------->
+<script>
+  window.userLogged = { id_users_categories: <%= userLogged.id_users_categories %>, id_companies: <%= userLogged.id_companies || 'null' %> }
+</script>
+<script type="module" src="/js/students/students.js"></script>

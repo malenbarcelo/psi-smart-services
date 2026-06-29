@@ -1,0 +1,117 @@
+/* Standard Table */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8e8e8;
+}
+
+/* Scrollable Table (infinite scroll) */
+.table-scroll-container {
+  width: 100%;
+  max-height: var(--table-height, calc(100vh - 220px));
+  overflow-y: auto;
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8e8e8;
+}
+
+.table-scroll-container .std-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.table-loading-row {
+  text-align: center;
+  padding: 16px;
+  color: #888;
+  font-size: 13px;
+}
+
+.std-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.std-table thead {
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.std-table thead th {
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: #444;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.std-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.15s;
+}
+
+.std-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.std-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.std-table tbody td {
+  padding: 10px 14px;
+  color: #333;
+  vertical-align: middle;
+}
+
+/* Sortable Headers */
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.th-sortable:hover {
+  color: #222;
+}
+
+.th-sortable .sort-icon {
+  margin-left: 6px;
+  font-size: 10px;
+  color: #444;
+}
+
+/* Fixed column widths */
+.std-table {
+  table-layout: fixed;
+}
+
+.std-table tbody td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Table Actions */
+.table-actions {
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+}
+
+/* Results table - horizontal scroll with fixed column widths */
+.results-table {
+  min-width: 1425px;
+  table-layout: fixed;
+}

@@ -1,0 +1,46 @@
+/* colors */
+:root {
+  --color1:#FF6501;
+  --color2:#dfdbdb;
+  --color3:#575656;
+  --color4:#848282;
+  --color5:black;
+  --errorColor: rgb(221, 7, 7);
+  --errorColorLight: rgb(202, 127, 127);
+  --okColor: green;
+  --okColorLight: rgb(173, 204, 173);
+}
+
+/* body */
+body {
+  font-family: 'Poppins', Arial, "sans-serif";
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+  letter-spacing: 0.3px;
+}
+
+/* inputs */
+input, select, textarea {
+  outline: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide arrows from input type number */
+input[type="checkbox"]:checked {
+  accent-color: black;
+}
+
+input[type="radio"]:checked {
+  accent-color: black;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}

@@ -1,0 +1,109 @@
+/* Buttons */
+.btn {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background-color: var(--color1);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #e55a00;
+}
+
+.btn-secondary {
+  background-color: #e8e8e8;
+  color: #444;
+}
+
+.btn-secondary:hover {
+  background-color: #ddd;
+}
+
+.btn-danger {
+  background-color: var(--errorColor);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c00;
+}
+
+/* Icon Buttons (table actions) */
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: background-color 0.2s;
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+.btn-icon:hover {
+  background-color: #e0e0e0;
+}
+
+.btn-icon-edit:hover {
+  background-color: #fff0e6;
+  color: var(--color1);
+}
+
+.btn-icon-delete:hover {
+  background-color: #ffe6e6;
+  color: var(--errorColor);
+}
+
+.btn-icon-enable:hover {
+  background-color: #e6f9e6;
+  color: #2e7d32;
+}
+
+.btn-icon-password:hover {
+  background-color: #e6f0ff;
+  color: #2a7ae2;
+}
+
+/* Button Link */
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color1);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 4px;
+  transition: opacity 0.2s;
+}
+
+.btn-link:hover {
+  opacity: 0.75;
+}
+
+/* Button Small */
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 12px;
+}

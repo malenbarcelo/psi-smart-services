@@ -1,0 +1,79 @@
+/* Input Groups */
+.input-row {
+  display: flex;
+  column-gap: 16px;
+  margin-bottom: 16px;
+}
+
+.input-row .input-group {
+  flex: 1;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+  margin-bottom: 14px;
+}
+
+.input-row .input-group {
+  margin-bottom: 0;
+}
+
+/* Labels */
+.input-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+}
+
+/* Fields */
+.input-field {
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333;
+  transition: border-color 0.2s;
+  background-color: #fafafa;
+}
+
+.input-field:focus {
+  border-color: var(--color1);
+  background-color: white;
+}
+
+/* Errors */
+.input-error {
+  display: none;
+  font-size: 11px;
+  color: var(--errorColor);
+  font-weight: 500;
+}
+
+/* Invalid state */
+.invalid-input {
+  border-color: var(--errorColor) !important;
+}
+
+.invalid-label {
+  color: var(--errorColor) !important;
+}
+
+/* Inline Create */
+.inline-create {
+  margin-top: 6px;
+}
+
+.inline-create-form {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 6px;
+}
+
+.inline-create-actions {
+  display: flex;
+  column-gap: 8px;
+  margin-top: 4px;
+}

@@ -1,0 +1,182 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<div class="page-content">
+  <div class="page-title-row">
+    <h1 class="page-title">Usuarios</h1>
+    <div class="page-title-actions">
+      <button class="btn btn-secondary" id="openFilterBtn">
+        <i class="fa-solid fa-filter"></i> Filtros
+      </button>
+      <button class="btn btn-primary" id="createUserBtn">
+        <i class="fa-solid fa-plus"></i> Nuevo Usuario
+      </button>
+    </div>
+  </div>
+
+  <div class="active-filters-bar" id="activeFiltersBar" style="display: none;">
+    <span class="active-filters-text">Filtros aplicados</span>
+    <button class="btn-clear-filters" id="clearFiltersBtn">
+      <i class="fa-solid fa-xmark"></i> Quitar filtros
+    </button>
+  </div>
+
+  <div class="table-scroll-container" id="tableScrollContainer" style="--table-height: calc(100vh - 190px)">
+    <table class="std-table">
+      <colgroup>
+        <col style="width: 15%">
+        <col style="width: 15%">
+        <col style="width: 22%">
+        <col style="width: 14%">
+        <col style="width: 15%">
+        <col style="width: 8%">
+        <col style="width: 11%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="th-sortable" data-sort="last_name">Apellido <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th class="th-sortable" data-sort="first_name">Nombre <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th class="th-sortable" data-sort="email">Email <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th>Categoría</th>
+          <th class="th-sortable" data-sort="company">Empresa <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody">
+        <!-- rows loaded via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create/Edit User Popup -->
+<div class="popup-overlay" id="userPopup">
+  <div class="popup-card popup-md">
+    <div class="popup-header">
+      <h3 class="popup-title" id="userPopupTitle">Nuevo Usuario</h3>
+      <i class="fa-solid fa-xmark popup-close" id="userPopupClose"></i>
+    </div>
+    <div class="popup-body">
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" id="firstNameLabel">Nombre</label>
+          <input type="text" class="input-field" id="firstName" autocomplete="off">
+          <span class="input-error" id="firstNameError"></span>
+        </div>
+        <div class="input-group">
+          <label class="input-label" id="lastNameLabel">Apellido</label>
+          <input type="text" class="input-field" id="lastName" autocomplete="off">
+          <span class="input-error" id="lastNameError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" id="emailLabel">Email</label>
+          <input type="text" class="input-field" id="email" autocomplete="off">
+          <span class="input-error" id="emailError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" id="userCategoryLabel">Categoría</label>
+          <select class="input-field" id="userCategory">
+            <option value="">Seleccionar</option>
+          </select>
+          <span class="input-error" id="userCategoryError"></span>
+        </div>
+        <div class="input-group">
+          <label class="input-label" id="userCompanyLabel">Empresa</label>
+          <select class="input-field" id="userCompany">
+            <option value="">Seleccionar</option>
+          </select>
+          <span class="input-error" id="userCompanyError"></span>
+          <div class="inline-create" id="inlineCreateCompany">
+            <button class="btn-link" id="showCreateCompanyBtn" type="button">
+              <i class="fa-solid fa-plus"></i> Crear empresa
+            </button>
+            <div class="inline-create-form" id="createCompanyForm" style="display: none;">
+              <input type="text" class="input-field" id="newCompanyName" autocomplete="off" placeholder="Nombre de la empresa">
+              <span class="input-error" id="newCompanyNameError"></span>
+              <div class="inline-create-actions">
+                <button class="btn btn-sm btn-secondary" id="cancelCreateCompanyBtn" type="button">Cancelar</button>
+                <button class="btn btn-sm btn-primary" id="saveCreateCompanyBtn" type="button">Crear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="userPopupCancel">Cancelar</button>
+      <button class="btn btn-primary" id="userPopupSave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Popup -->
+<div class="popup-overlay" id="confirmPopup">
+  <div class="popup-card popup-sm">
+    <div class="popup-header">
+      <h3 class="popup-title" id="confirmPopupTitle">Confirmar</h3>
+      <i class="fa-solid fa-xmark popup-close" id="confirmPopupClose"></i>
+    </div>
+    <div class="popup-body">
+      <p id="confirmPopupMessage">¿Está seguro?</p>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="confirmPopupCancel">Cancelar</button>
+      <button class="btn btn-danger" id="confirmPopupAccept">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Side Panel -->
+<div class="filter-panel" id="filterPanel">
+  <div class="filter-panel-header">
+    <h3 class="filter-panel-title">Filtros</h3>
+    <i class="fa-solid fa-xmark filter-panel-close" id="filterPanelClose"></i>
+  </div>
+  <div class="filter-panel-body">
+    <div class="input-group">
+      <label class="input-label">Nombre / Apellido</label>
+      <input type="text" class="input-field" id="filterName" autocomplete="off" placeholder="Buscar por nombre...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Email</label>
+      <input type="text" class="input-field" id="filterEmail" autocomplete="off" placeholder="Buscar por email...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Empresa</label>
+      <input type="text" class="input-field" id="filterCompany" autocomplete="off" placeholder="Buscar por empresa...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Categoría</label>
+      <select class="input-field" id="filterCategory">
+        <option value="">Todas</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Estado</label>
+      <select class="input-field" id="filterEnabled">
+        <option value="">Todos</option>
+        <option value="1">Activo</option>
+        <option value="0">Inactivo</option>
+      </select>
+    </div>
+  </div>
+  <div class="filter-panel-footer">
+    <button class="btn btn-secondary" id="filterClearBtn">Limpiar</button>
+    <button class="btn btn-primary" id="filterApplyBtn">Aplicar</button>
+  </div>
+</div>
+<div class="filter-panel-overlay" id="filterPanelOverlay"></div>
+
+<!-- Result Popup -->
+<div class="result-popup" id="resultPopup">
+  <i class="fa-solid fa-check result-popup-icon"></i>
+  <span class="result-popup-text" id="resultPopupText">Operación exitosa</span>
+</div>
+
+<!----------SCRIPTS---------->
+<script type="module" src="/js/users/users.js"></script>

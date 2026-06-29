@@ -1,0 +1,62 @@
+<div class="header">
+    <div class="top-header">
+        <div class="top-header-left">
+            <div class="burger-menu" id="burgerMenu">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+            <img src="/images/companyLogo.png" alt="multibrand" class="company-logo">
+        </div>
+        <div class="top-header-right">
+            <% if (locals.userLogged) { %>
+                <div class="user-logged">
+                    <div class="user-icon-circle">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <span class="user-logged-name"><%= userLogged.first_name + ' ' + userLogged.last_name %></span>
+                    <a href="/logout" class="logout-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Side Menu Overlay -->
+<div class="side-menu-overlay" id="sideMenuOverlay"></div>
+
+<!-- Side Menu -->
+<div class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+        <i class="fa-solid fa-bars side-menu-header-icon"></i>
+        <span class="side-menu-header-title">Menú</span>
+    </div>
+
+    <div class="side-menu-items">
+        <% if (locals.bottomHeaderMenu) { %>
+            <% bottomHeaderMenu.forEach(itemMenu => { %>
+                <% if (itemMenu.subitems.length === 0) { %>
+                    <a href="<%= itemMenu.href %>" class="side-menu-item <%= locals.selectedItem == itemMenu.name ? 'smi-selected' : '' %>">
+                        <%= itemMenu.name %>
+                    </a>
+                <% } else { %>
+                    <% const hasSelectedSubitem = itemMenu.subitems.some(s => locals.selectedSubitem == s.name) %>
+                    <div class="side-menu-expandable-wrapper">
+                        <div class="side-menu-item side-menu-expandable <%= hasSelectedSubitem ? 'smi-selected' : '' %>">
+                            <span><%= itemMenu.name %></span>
+                            <i class="fa-solid fa-chevron-down side-menu-chevron"></i>
+                        </div>
+                        <div class="side-menu-subitems <%= hasSelectedSubitem ? 'subitems-visible' : '' %>">
+                            <% itemMenu.subitems.forEach(subitem => { %>
+                                <a href="<%= subitem.href %>" class="side-menu-subitem <%= locals.selectedSubitem == subitem.name ? 'smi-subitem-selected' : '' %>">
+                                    <%= subitem.name %>
+                                </a>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+            <% }) %>
+        <% } %>
+    </div>
+</div>
+
+<!----------SCRIPTS---------->
+<script type="module" src="/js/header/header.js"></script>

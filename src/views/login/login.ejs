@@ -1,0 +1,44 @@
+<%- include('../partials/head') %>
+
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="/images/companyLogo.jpg" alt="PSI Smart Services" class="login-logo-img">
+    </div>
+
+    <form action="/login" method="POST" class="login-form">
+      <div class="login-field">
+        <label class="login-label">Email</label>
+        <div class="login-input-wrapper">
+          <i class="fa-solid fa-envelope login-input-icon"></i>
+          <input type="email" name="email" class="login-input"
+            value="<%= locals.oldData ? oldData.email : '' %>"
+            autocomplete="off" placeholder="Ingrese su email">
+        </div>
+        <% if (locals.errors && errors.email) { %>
+          <span class="login-error-msg"><%= errors.email.msg %></span>
+        <% } %>
+      </div>
+
+      <div class="login-field">
+        <label class="login-label">Contraseña</label>
+        <div class="login-input-wrapper">
+          <i class="fa-solid fa-lock login-input-icon"></i>
+          <input type="password" name="password" class="login-input"
+            value="<%= locals.oldData ? oldData.password : '' %>"
+            autocomplete="off" placeholder="Ingrese su contraseña">
+        </div>
+        <% if (locals.errors && errors.password) { %>
+          <span class="login-error-msg"><%= errors.password.msg %></span>
+        <% } %>
+      </div>
+
+      <button type="submit" class="login-btn" id="loginBtn">Iniciar Sesión</button>
+    </form>
+
+    <div class="login-links">
+      <a href="#" class="login-link" id="restorePassword">¿Olvidaste tu contraseña?</a>
+      <a href="#" class="login-link">Cambiar contraseña</a>
+    </div>
+  </div>
+</div>
