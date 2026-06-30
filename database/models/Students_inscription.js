@@ -35,6 +35,11 @@ module.exports = (sequelize, DataTypes) => {
     updated_at: {
       type: DataTypes.DATEONLY,
       allowNull: true,
+    },
+    enabled: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }
 
@@ -49,6 +54,7 @@ module.exports = (sequelize, DataTypes) => {
     Students_inscriptions.belongsTo(models.Users_companies, { as: 'company_data', foreignKey: 'id_companies' })
     Students_inscriptions.belongsTo(models.Students, { as: 'student_data', foreignKey: 'id_students' })
     Students_inscriptions.belongsTo(models.Courses, { as: 'course_data', foreignKey: 'id_courses' })
+    Students_inscriptions.hasMany(models.Students_exams, { as: 'exams', foreignKey: 'id_students_inscriptions' })
     Students_inscriptions.hasMany(models.Students_exams_theoricals, { as: 'exams_theoricals', foreignKey: 'id_students_inscriptions' })
   }
 

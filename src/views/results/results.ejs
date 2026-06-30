@@ -8,6 +8,9 @@
       <button class="btn btn-secondary" id="openFilterBtn">
         <i class="fa-solid fa-filter"></i> Filtros
       </button>
+      <button class="btn btn-primary" id="createInscriptionBtn">
+        <i class="fa-solid fa-plus"></i> Inscripciones
+      </button>
     </div>
   </div>
 
@@ -54,6 +57,76 @@
         <!-- rows loaded via JS -->
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Inscription Popup -->
+<div class="popup-overlay" id="inscriptionPopup">
+  <div class="popup-card popup-md">
+    <div class="popup-header">
+      <h3 class="popup-title">Nueva Inscripción</h3>
+      <i class="fa-solid fa-xmark popup-close" id="inscriptionPopupClose"></i>
+    </div>
+    <div class="popup-body">
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label">Empresa</label>
+          <select class="input-field" id="inscriptionCompany">
+            <option value="">Seleccionar</option>
+          </select>
+          <span class="input-error" id="inscriptionCompanyError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group" style="flex: 7">
+          <label class="input-label">Curso</label>
+          <select class="input-field" id="inscriptionCourse">
+            <option value="">Seleccionar</option>
+          </select>
+          <span class="input-error" id="inscriptionCourseError"></span>
+        </div>
+        <div class="input-group" style="flex: 3">
+          <label class="input-label">Evento</label>
+          <select class="input-field" id="inscriptionEvent">
+            <option value="">Seleccionar</option>
+          </select>
+          <span class="input-error" id="inscriptionEventError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label">DNI - Sin puntos ni guiones</label>
+          <input type="text" class="input-field" id="inscriptionDni" autocomplete="off">
+          <span class="input-error" id="inscriptionDniError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label">Apellido</label>
+          <input type="text" class="input-field" id="inscriptionLastName" autocomplete="off">
+          <span class="input-error" id="inscriptionLastNameError"></span>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Nombre</label>
+          <input type="text" class="input-field" id="inscriptionFirstName" autocomplete="off">
+          <span class="input-error" id="inscriptionFirstNameError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label">Email</label>
+          <input type="text" class="input-field" id="inscriptionEmail" autocomplete="off">
+          <span class="input-error" id="inscriptionEmailError"></span>
+        </div>
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="massInscriptionBtn" style="margin-right: auto">
+        <i class="fa-solid fa-file-excel"></i> Inscripción masiva
+      </button>
+      <button class="btn btn-secondary" id="inscriptionPopupCancel">Cancelar</button>
+      <button class="btn btn-primary" id="inscriptionPopupSave">Guardar</button>
+    </div>
   </div>
 </div>
 

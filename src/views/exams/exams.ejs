@@ -1,0 +1,64 @@
+<%- include('../partials/head') %>
+<link rel="stylesheet" href="/css/custom/exams.css?v=<%= Date.now() %>">
+
+<!-- DNI Entry Screen -->
+<div class="exams-page" id="examsLoginScreen">
+  <div class="exams-card">
+    <div class="exams-logo">
+      <img src="/images/companyLogo.jpg" alt="PSI Smart Services" class="exams-logo-img">
+    </div>
+    <h2 class="exams-title">Exámenes Online</h2>
+    <p class="exams-subtitle">Ingresá tu DNI sin puntos ni guiones</p>
+    <div class="exams-field">
+      <div class="exams-input-wrapper">
+        <i class="fa-solid fa-id-card exams-input-icon"></i>
+        <input type="text" class="exams-input" id="examsDni" placeholder="Ej: 12345678" autocomplete="off" maxlength="8" inputmode="numeric">
+      </div>
+      <span class="exams-error" id="examsDniError"></span>
+    </div>
+    <button class="exams-btn" id="examSearchBtn">Buscar DNI</button>
+  </div>
+</div>
+
+<!-- Exams List Screen -->
+<div id="examsListScreen" style="display: none;">
+  <div class="header">
+    <div class="top-header">
+      <div class="top-header-left">
+        <img src="/images/companyLogo.png" alt="PSI Smart Services" class="company-logo">
+      </div>
+      <div class="top-header-right">
+        <div class="user-logged">
+          <div class="user-icon-circle">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <span class="user-logged-name" id="examsStudentName"></span>
+          <span class="user-logged-initials" id="examsStudentInitials"></span>
+          <a href="/examenes" class="logout-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="exams-list-page">
+    <div class="exams-list-container" id="examsListContainer">
+      <!-- cards rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- No Exams Message -->
+<div class="exams-page" id="examsNoExamsScreen" style="display: none;">
+  <div class="exams-card">
+    <div class="exams-logo">
+      <img src="/images/companyLogo.jpg" alt="PSI Smart Services" class="exams-logo-img">
+    </div>
+    <div class="exams-no-exams">
+      <i class="fa-solid fa-circle-check exams-no-exams-icon"></i>
+      <h3 class="exams-no-exams-title">No tenés exámenes pendientes</h3>
+      <p class="exams-no-exams-text">Todos tus exámenes están aprobados o no tenés inscripciones activas.</p>
+    </div>
+    <button class="exams-btn exams-btn-secondary" id="examsBackBtn">Volver</button>
+  </div>
+</div>
+
+<script type="module" src="/js/exams/exams.js"></script>

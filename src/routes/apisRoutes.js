@@ -7,6 +7,9 @@ const authMiddleware = require('../middlewares/authMiddleware.js')
 
 const router = express.Router()
 
+// public routes (no auth required)
+router.get('/exams/search-dni/:dni', getController.searchExamsByDni)
+
 // get routes
 router.get('/users', authMiddleware, getController.getUsers)
 router.get('/users/:id', authMiddleware, getController.getUserById)
@@ -21,6 +24,7 @@ router.get('/courses', authMiddleware, getController.getCourses)
 router.post('/users', authMiddleware, createController.createUser)
 router.post('/users-companies', authMiddleware, createController.createCompany)
 router.post('/students', authMiddleware, createController.createStudent)
+router.post('/inscriptions', authMiddleware, createController.createInscription)
 
 // update routes
 router.put('/users/:id', authMiddleware, updateController.updateUser)

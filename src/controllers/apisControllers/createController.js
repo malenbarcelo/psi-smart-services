@@ -136,6 +136,125 @@ const createController = {
       console.log(error)
       return res.status(500).json({ error: 'Error creating student' })
     }
+  },
+
+  createInscription: async(req, res) => {
+    try {
+      const { id_companies, id_courses, dni, first_name, last_name, email } = req.body
+
+      if (!id_companies || !id_courses || !dni || !first_name || !last_name || !email) {
+        return res.status(400).json({ error: 'All fields are required' })
+      }
+
+      // find or create student by DNI + company
+      let student
+      const existing = await studentsQueries.get({ filters: { dni, id_companies } })
+
+      if (existing.rows.length > 0) {
+        student = existing.rows[0]
+      } else {
+        student = await studentsQueries.create({
+          first_name,
+          last_name,
+          email,
+          dni: parseInt(dni),
+          id_companies: parseInt(id_companies),
+          enabled: 1
+        })
+      }
+
+      // create inscription
+      const today = new Date().toISOString().split('T')[0]
+      const newInscription = await db.Students_inscriptions.create({
+        id_companies: parseInt(id_companies),
+        id_students: student.id,
+        id_courses: parseInt(id_courses),
+        inscription_date: today,
+        status: 'pending',
+        grade: null,
+        updated_at: null,
+        enabled: 1
+      })
+
+      // create student exams for each course exam
+      const courseExams = await db.Courses_exams.findAll({
+        where: { id_courses: parseInt(id_courses), enabled: 1 }
+      })
+
+      for (const exam of courseExams) {
+        // get max exam_version for this course exam
+        const maxVersion = await db.Courses_exams_questions.max('exam_version', {
+          where: { id_courses_exams: exam.id }
+        })
+
+        // get unique variants for this course exam (at max version)
+        const variantRecords = await db.Courses_exams_questions.findAll({
+          where: { id_courses_exams: exam.id, exam_version: maxVersion || 1 },
+          attributes: [[db.sequelize.fn('DISTINCT', db.sequelize.col('exam_variant')), 'exam_variant']],
+          raw: true
+        })
+
+        const variants = variantRecords.map(r => r.exam_variant)
+        const randomVariant = variants.length > 0
+          ? variants[Math.floor(Math.random() * variants.length)]
+          : 'A'
+
+        const newStudentExam = await db.Students_exams.create({
+          id_students: student.id,
+          id_students_inscriptions: newInscription.id,
+          id_courses: parseInt(id_courses),
+          id_courses_exams: exam.id,
+          exam_type: exam.exam_type,
+          exam_index: exam.exam_index,
+          exam_version: maxVersion || 1,
+          exam_variant: randomVariant,
+          exam_status: 'pending',
+          exam_grade: null,
+          updated_at: null
+        })
+
+        // get questions for this exam at the assigned version and variant
+        const questions = await db.Courses_exams_questions.findAll({
+          where: {
+            id_courses_exams: exam.id,
+            exam_version: maxVersion || 1,
+            exam_variant: randomVariant
+          }
+        })
+
+        // create answer records for each question
+        for (const question of questions) {
+          // get correct option ids for this question
+          const correctOptions = await db.Courses_exams_questions_options.findAll({
+            where: {
+              id_courses_exams_questions: question.id,
+              correct_option: 1
+            },
+            attributes: ['id'],
+            raw: true
+          })
+
+          const idsCorrectOptions = correctOptions.map(o => o.id).join(',')
+
+          await db.Students_exams_answers.create({
+            id_students: student.id,
+            id_students_inscriptions: newInscription.id,
+            id_students_exams: newStudentExam.id,
+            id_courses_exams: exam.id,
+            id_courses_exams_questions: question.id,
+            ids_selected_options: null,
+            ids_correct_options: idsCorrectOptions,
+            correct_answer: null,
+            updated_at: null
+          })
+        }
+      }
+
+      return res.status(201).json(newInscription)
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error creating inscription' })
+    }
   }
 }
 

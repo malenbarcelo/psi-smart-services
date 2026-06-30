@@ -1,4 +1,5 @@
 // results module - global constants, DOM elements, and state
+import { gu } from '../globalUtils.js'
 
 // DOM elements
 export const elements = {
@@ -13,7 +14,12 @@ export const elements = {
   resultsTableBody: document.getElementById('resultsTableBody'),
   tableScrollContainer: document.getElementById('tableScrollContainer'),
   resultPopup: document.getElementById('resultPopup'),
-  resultPopupText: document.getElementById('resultPopupText')
+  resultPopupText: document.getElementById('resultPopupText'),
+  createInscriptionBtn: document.getElementById('createInscriptionBtn'),
+  inscriptionPopup: document.getElementById('inscriptionPopup'),
+  inscriptionPopupClose: document.getElementById('inscriptionPopupClose'),
+  inscriptionPopupCancel: document.getElementById('inscriptionPopupCancel'),
+  inscriptionPopupSave: document.getElementById('inscriptionPopupSave')
 }
 
 // filter inputs
@@ -29,3 +35,8 @@ export const state = {
   currentSortBy: '',
   currentSortOrder: ''
 }
+
+// close popups with Escape and close buttons
+const popups = [elements.inscriptionPopup]
+gu.closePopups(popups)
+gu.closeWithEscape(popups)

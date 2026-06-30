@@ -16,6 +16,10 @@
   transform: scale(0.97);
 }
 
+.btn:focus {
+  outline: none;
+}
+
 .btn-primary {
   background-color: var(--color1);
   color: white;
@@ -63,6 +67,10 @@
   background-color: #e0e0e0;
 }
 
+.btn-icon:focus {
+  outline: none;
+}
+
 .btn-icon-edit:hover {
   background-color: #fff0e6;
   color: var(--color1);
@@ -100,6 +108,10 @@
 
 .btn-link:hover {
   opacity: 0.75;
+}
+
+.btn-link:focus {
+  outline: none;
 }
 
 /* Button Small */

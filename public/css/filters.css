@@ -114,6 +114,10 @@
   background-color: #ffe0c0;
 }
 
+.btn-clear-filters:focus {
+  outline: none;
+}
+
 /* Filter panel inputs */
 .filter-panel .input-field {
   color: var(--color4);

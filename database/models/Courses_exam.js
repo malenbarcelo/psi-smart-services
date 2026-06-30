@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(200),
       allowNull: false,
     },
-    exm_type: {
+    exam_type: {
       type: DataTypes.STRING(50),
       allowNull: false,
     },

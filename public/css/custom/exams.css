@@ -1,0 +1,369 @@
+/* Exams Page - Public exam view */
+.exams-page {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f5f7;
+  padding: 20px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.exams-page-list {
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* Exams List Page (below header) */
+.exams-list-page {
+  min-height: calc(100vh - 55px);
+  width: 100%;
+  background-color: #f3f5f7;
+  padding: 24px 20px 40px;
+  box-sizing: border-box;
+}
+
+/* Student initials (mobile only) */
+.user-logged-initials {
+  display: none;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Entry Card */
+.exams-card {
+  background: white;
+  border-radius: 16px;
+  padding: 45px 35px 35px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.exams-logo {
+  margin-bottom: 28px;
+}
+
+.exams-logo-img {
+  height: 32px;
+}
+
+.exams-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.exams-subtitle {
+  margin: 0 0 24px;
+  font-size: 13px;
+  color: #777;
+}
+
+.exams-field {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.exams-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: #f0f2f5;
+  border-radius: 10px;
+  padding: 0 14px;
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.exams-input-wrapper:focus-within {
+  border-color: var(--color1);
+}
+
+.exams-input-icon {
+  color: #999;
+  font-size: 15px;
+  margin-right: 10px;
+}
+
+.exams-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 14px 0;
+  font-size: 15px;
+  outline: none;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+.exams-input::placeholder {
+  color: #aaa;
+  letter-spacing: 0;
+}
+
+.exams-error {
+  display: none;
+  font-size: 12px;
+  color: var(--errorColor);
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.exams-btn {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--color1);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.exams-btn:hover {
+  background-color: #e55a00;
+}
+
+.exams-btn:active {
+  transform: scale(0.98);
+}
+
+.exams-btn:focus {
+  outline: none;
+}
+
+.exams-btn-secondary {
+  background-color: #e8e8e8;
+  color: #444;
+}
+
+.exams-btn-secondary:hover {
+  background-color: #ddd;
+}
+
+/* No Exams */
+.exams-no-exams {
+  margin: 10px 0 25px;
+}
+
+.exams-no-exams-icon {
+  font-size: 42px;
+  color: #28a745;
+  margin-bottom: 14px;
+}
+
+.exams-no-exams-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.exams-no-exams-text {
+  margin: 0;
+  font-size: 13px;
+  color: #777;
+}
+
+/* List Container */
+.exams-list-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+}
+
+/* Course Card */
+.exam-course-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.exam-course-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.exam-course-card-name {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+}
+
+.exam-course-card-company {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+  margin: 0;
+}
+
+.exam-course-card-body {
+  padding: 12px 20px 16px;
+}
+
+/* Exam Item Row */
+.exam-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+  column-gap: 12px;
+}
+
+.exam-item:last-child {
+  border-bottom: none;
+}
+
+.exam-item-left {
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-item-index {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+}
+
+.exam-item-name {
+  font-size: 13px;
+  color: #444;
+}
+
+/* Exam Status Badges */
+.exam-status-badge {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.exam-status-badge-passed {
+  color: #28a745;
+  background-color: #e6f9e6;
+}
+
+.exam-status-badge-failed {
+  color: var(--errorColor);
+  background-color: #ffe6e6;
+}
+
+.exam-status-badge-progress {
+  color: var(--color1);
+  background-color: #fff3e6;
+}
+
+.exam-status-badge-pending {
+  color: #888;
+  background-color: #f0f0f0;
+}
+
+.exam-item-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+}
+
+/* Exam Action Button */
+.exam-action-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.exam-action-btn:focus {
+  outline: none;
+}
+
+.exam-action-btn-active {
+  background-color: var(--color1);
+  color: white;
+}
+
+.exam-action-btn-active:hover {
+  background-color: #e55a00;
+}
+
+.exam-action-btn-disabled {
+  background-color: #e8e8e8;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .exams-card {
+    padding: 35px 24px 28px;
+  }
+
+  .exams-list-page {
+    padding: 16px 12px 30px;
+  }
+
+  .exam-course-card-header {
+    padding: 14px 16px;
+  }
+
+  .exam-course-card-body {
+    padding: 10px 16px 14px;
+  }
+
+  /* stacked layout for exam items on mobile */
+  .exam-item {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    padding: 12px 0;
+  }
+
+  .exam-item-left {
+    width: 100%;
+  }
+
+  .exam-item-right {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* show initials, hide full name */
+  .user-logged-name {
+    display: none;
+  }
+
+  .user-logged-initials {
+    display: inline;
+  }
+}

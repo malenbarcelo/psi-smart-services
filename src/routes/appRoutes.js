@@ -16,5 +16,6 @@ router.get('/logout', appController.logout)
 router.get('/usuarios', authMiddleware, routeAccessMiddleware, appController.users)
 router.get('/alumnos', authMiddleware, routeAccessMiddleware, appController.students)
 router.get('/resultados', authMiddleware, routeAccessMiddleware, appController.results)
+router.get('/examenes', appController.exams)
 
 module.exports = router

@@ -87,6 +87,15 @@ const appController = {
       return res.send('Ha ocurrido un error')
     }
   },
+
+  exams: async(req, res) => {
+    try {
+      return res.render('exams/exams', { title })
+    } catch(error) {
+      console.log(error)
+      return res.send('Ha ocurrido un error')
+    }
+  },
 }
 
 module.exports = appController

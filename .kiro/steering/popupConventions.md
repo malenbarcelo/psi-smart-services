@@ -1,0 +1,29 @@
+# Convenciones de Popups
+
+## Cierre con Escape
+
+Todos los popups (`.popup-overlay`) deben poder cerrarse con la tecla Escape. Esto se logra usando `gu.closeWithEscape(popups)` en el `globals.js` de cada módulo.
+
+## Patrón obligatorio en `globals.js`
+
+Al final del archivo `globals.js` de cada módulo que tenga popups, se deben registrar todos los popups del módulo:
+
+```javascript
+import { gu } from '../globalUtils.js'
+
+// ... definición de elements, state, etc.
+
+// close popups with Escape and close buttons
+const popups = [elements.myPopup, elements.confirmPopup]
+gu.closePopups(popups)
+gu.closeWithEscape(popups)
+```
+
+## Reglas
+
+- `gu.closePopups(popups)` registra los listeners de cierre en los botones Close (X) y Cancel de cada popup
+- `gu.closeWithEscape(popups)` registra un listener global de Escape que cierra el popup visible
+- Ambas funciones reciben el mismo array de elementos popup
+- Todo popup nuevo que se agregue a un módulo debe sumarse a ese array
+- No duplicar lógica de cierre manualmente en `forms.js` si ya está registrada en `globals.js`
+- El order del array importa: `closeWithEscape` cierra el primer popup visible que encuentre en el array
