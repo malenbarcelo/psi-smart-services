@@ -6,7 +6,7 @@ const model = db.Students_inscriptions
 
 const resultsQueries = {
   get: async({ filters = {}, pagination = {}, sort = {} } = {}) => {
-    const where = {}
+    const where = { enabled: 1 }
 
     // filter by company (visibility)
     if (filters.id_companies) {
@@ -39,9 +39,12 @@ const resultsQueries = {
       ]
     }
 
-    // student dni search
+    // student dni search (partial match)
     if (filters.dni) {
-      studentWhere.dni = filters.dni
+      studentWhere.dni = db.sequelize.where(
+        db.sequelize.cast(db.sequelize.col('student_data.dni'), 'CHAR'),
+        { [Op.like]: `%${filters.dni}%` }
+      )
     }
 
     // student email search
@@ -71,7 +74,7 @@ const resultsQueries = {
       }
     }
 
-    const hasStudentFilter = Object.keys(studentWhere).length > 0
+    const hasStudentFilter = Object.keys(studentWhere).length > 0 || Object.getOwnPropertySymbols(studentWhere).length > 0
     const hasCompanyFilter = Object.keys(companyWhere).length > 0
 
     const options = {

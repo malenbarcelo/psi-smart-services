@@ -91,6 +91,26 @@
   color: #2a7ae2;
 }
 
+.btn-icon-detail:hover {
+  background-color: #e6f0ff;
+  color: #2a7ae2;
+}
+
+.btn-icon-photo:hover {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+.btn-icon-credential:hover {
+  background-color: #fff0e6;
+  color: var(--color1);
+}
+
+.btn-icon-certificate:hover {
+  background-color: #e6f9e6;
+  color: #2e7d32;
+}
+
 /* Button Link */
 .btn-link {
   background: none;

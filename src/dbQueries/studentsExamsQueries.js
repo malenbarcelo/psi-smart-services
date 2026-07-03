@@ -2,9 +2,9 @@
 
 const db = require('../../database/models')
 const { Op } = require('sequelize')
-const model = db.Students_exams_theoricals
+const model = db.Students_exams
 
-const studentsExamsTheoricalsQueries = {
+const studentsExamsQueries = {
   get: async({ filters = {}, pagination = {} } = {}) => {
     const where = {}
 
@@ -23,9 +23,19 @@ const studentsExamsTheoricalsQueries = {
       where.id_courses = filters.id_courses
     }
 
-    // filter by theoricals status
-    if (filters.theoricals_status) {
-      where.theoricals_status = filters.theoricals_status
+    // filter by course exam
+    if (filters.id_courses_exams) {
+      where.id_courses_exams = filters.id_courses_exams
+    }
+
+    // filter by exam type
+    if (filters.exam_type) {
+      where.exam_type = filters.exam_type
+    }
+
+    // filter by exam status
+    if (filters.exam_status) {
+      where.exam_status = filters.exam_status
     }
 
     const options = {
@@ -34,7 +44,8 @@ const studentsExamsTheoricalsQueries = {
       include: [
         { model: db.Students, as: 'student_data' },
         { model: db.Students_inscriptions, as: 'inscription_data' },
-        { model: db.Courses, as: 'course_data' }
+        { model: db.Courses, as: 'course_data' },
+        { model: db.Courses_exams, as: 'course_exam_data' }
       ]
     }
 
@@ -54,7 +65,8 @@ const studentsExamsTheoricalsQueries = {
       include: [
         { model: db.Students, as: 'student_data' },
         { model: db.Students_inscriptions, as: 'inscription_data' },
-        { model: db.Courses, as: 'course_data' }
+        { model: db.Courses, as: 'course_data' },
+        { model: db.Courses_exams, as: 'course_exam_data' }
       ]
     })
     return row
@@ -77,4 +89,4 @@ const studentsExamsTheoricalsQueries = {
   }
 }
 
-module.exports = studentsExamsTheoricalsQueries
+module.exports = studentsExamsQueries

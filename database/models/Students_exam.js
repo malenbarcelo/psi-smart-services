@@ -66,6 +66,7 @@ module.exports = (sequelize, DataTypes) => {
     Students_exams.belongsTo(models.Students_inscriptions, { as: 'inscription_data', foreignKey: 'id_students_inscriptions' })
     Students_exams.belongsTo(models.Courses, { as: 'course_data', foreignKey: 'id_courses' })
     Students_exams.belongsTo(models.Courses_exams, { as: 'course_exam_data', foreignKey: 'id_courses_exams' })
+    Students_exams.hasMany(models.Students_inscriptions_observations, { as: 'observations', foreignKey: 'id_students_exams' })
   }
 
   return Students_exams

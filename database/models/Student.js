@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BIGINT,
       allowNull: false,
     },
+    photo: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
     enabled: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -44,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
   Students.associate = (models) => {
     Students.belongsTo(models.Users_companies, { as: 'company_data', foreignKey: 'id_companies' })
     Students.hasMany(models.Students_inscriptions, { as: 'inscriptions', foreignKey: 'id_students' })
-    Students.hasMany(models.Students_exams_theoricals, { as: 'exams_theoricals', foreignKey: 'id_students' })
+    Students.hasMany(models.Students_exams, { as: 'exams', foreignKey: 'id_students' })
   }
 
   return Students

@@ -17,6 +17,11 @@ function getStatusBadge(status) {
 // format date to dd/mm/yyyy
 function formatDate(dateStr) {
   if (!dateStr) return '-'
+  // handle DATEONLY strings (YYYY-MM-DD) without timezone conversion
+  if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [year, month, day] = dateStr.split('-')
+    return `${day}/${month}/${year}`
+  }
   const date = new Date(dateStr)
   const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -38,7 +43,7 @@ function formatExpiration(updatedAt, validityMonths, status) {
   if (status === 'pending' || status === 'not-passed' || status === 'in-progress') return '-'
   if (!updatedAt || !validityMonths) return '-'
 
-  const expirationDate = new Date(updatedAt)
+  const expirationDate = new Date(updatedAt + 'T00:00:00')
   expirationDate.setMonth(expirationDate.getMonth() + validityMonths)
 
   const now = new Date()
@@ -55,6 +60,14 @@ function formatExpiration(updatedAt, validityMonths, status) {
   return `<span style="color: ${color};"><span style="font-weight: 600;">${formatted}</span><br>${daysLabel}</span>`
 }
 
+// check if inscription is expired
+function isExpired(updatedAt, validityMonths) {
+  if (!updatedAt || !validityMonths) return false
+  const expirationDate = new Date(updatedAt + 'T00:00:00')
+  expirationDate.setMonth(expirationDate.getMonth() + validityMonths)
+  return expirationDate < new Date()
+}
+
 // render rows (append mode for infinite scroll)
 function renderRows(results) {
   results.forEach(result => {
@@ -66,13 +79,19 @@ function renderRows(results) {
     const courseName = result.course_data ? result.course_data.course_name : '-'
     const validityMonths = result.course_data ? result.course_data.validity_months : null
 
+    const canSelect = result.status === 'passed' && !isExpired(result.updated_at, validityMonths)
+    const checkboxHtml = canSelect
+      ? `<input type="checkbox" class="row-checkbox" data-id="${result.id}">`
+      : ''
+
     tr.innerHTML = `
-      <td><input type="checkbox" class="row-checkbox" data-id="${result.id}"></td>
+      <td>${checkboxHtml}</td>
       <td>${result.id}</td>
       <td>${companyName}</td>
       <td>${courseName}</td>
       <td>-</td>
       <td>${studentName}</td>
+      <td>${result.student_data ? result.student_data.dni : '-'}</td>
       <td>${getStatusBadge(result.status)}</td>
       <td>${formatGrade(result.grade, result.status)}</td>
       <td>${validityMonths ? validityMonths + ' meses' : '-'}</td>
@@ -80,8 +99,10 @@ function renderRows(results) {
       <td>${formatExpiration(result.updated_at, validityMonths, result.status)}</td>
       <td>
         <div class="table-actions">
-          <button class="btn-icon" data-id="${result.id}" title="Ver detalle"><i class="fa-solid fa-eye"></i></button>
-          <button class="btn-icon" data-id="${result.id}" title="Foto"><i class="fa-solid fa-camera"></i></button>
+          <button class="btn-icon btn-icon-detail" data-id="${result.id}" title="Ver detalle"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+          <button class="btn-icon btn-icon-photo" data-id="${result.id}" title="Foto"><i class="fa-solid fa-camera"></i></button>
+          <button class="btn-icon btn-icon-credential" data-id="${result.id}" title="Reimprimir credencial"><i class="fa-solid fa-id-card"></i></button>
+          <button class="btn-icon btn-icon-certificate" data-id="${result.id}" title="Reimprimir certificado"><i class="fa-solid fa-award"></i></button>
         </div>
       </td>
     `
@@ -143,9 +164,29 @@ function updateSortIcons() {
 export function initTable() {
   // select all checkbox
   const selectAllCheckbox = document.getElementById('selectAllCheckbox')
+
+  // individual checkboxes: uncheck "select all" if any row is unchecked
+  elements.resultsTableBody.addEventListener('change', (e) => {
+    if (e.target.classList.contains('row-checkbox')) {
+      const rowCheckboxes = elements.resultsTableBody.querySelectorAll('.row-checkbox')
+      const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked)
+      selectAllCheckbox.checked = allChecked
+      toggleDownloadBtn()
+    }
+  })
+
+  // show/hide download button based on selection
+  function toggleDownloadBtn() {
+    const downloadBtn = document.getElementById('downloadSelectedBtn')
+    const anyChecked = elements.resultsTableBody.querySelectorAll('.row-checkbox:checked').length > 0
+    downloadBtn.style.display = anyChecked ? 'inline-flex' : 'none'
+  }
+
+  // update download btn when select all changes
   selectAllCheckbox.addEventListener('change', () => {
     const rowCheckboxes = elements.resultsTableBody.querySelectorAll('.row-checkbox')
     rowCheckboxes.forEach(cb => { cb.checked = selectAllCheckbox.checked })
+    toggleDownloadBtn()
   })
 
   // infinite scroll

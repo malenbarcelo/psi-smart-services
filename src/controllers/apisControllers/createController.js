@@ -255,6 +255,47 @@ const createController = {
       console.log(error)
       return res.status(500).json({ error: 'Error creating inscription' })
     }
+  },
+
+  createObservation: async(req, res) => {
+    try {
+      const { id_students_inscriptions, id_students_exams, observations } = req.body
+
+      if (!id_students_inscriptions || !id_students_exams) {
+        return res.status(400).json({ error: 'Missing required fields' })
+      }
+
+      // get id_students from the inscription
+      const inscription = await db.Students_inscriptions.findByPk(id_students_inscriptions)
+      if (!inscription) {
+        return res.status(404).json({ error: 'Inscription not found' })
+      }
+
+      // check if observation already exists for this exam
+      const existing = await db.Students_inscriptions_observations.findOne({
+        where: { id_students_exams }
+      })
+
+      if (existing) {
+        await db.Students_inscriptions_observations.update(
+          { observations },
+          { where: { id: existing.id } }
+        )
+        return res.json({ success: true, updated: true })
+      }
+
+      await db.Students_inscriptions_observations.create({
+        id_students: inscription.id_students,
+        id_students_inscriptions: parseInt(id_students_inscriptions),
+        id_students_exams: parseInt(id_students_exams),
+        observations: observations || null
+      })
+
+      return res.status(201).json({ success: true })
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error creating observation' })
+    }
   }
 }
 

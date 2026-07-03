@@ -78,6 +78,13 @@
   color: #333;
 }
 
+.popup-subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #888;
+  font-weight: 400;
+}
+
 /* Popup Body */
 .popup-body {
   padding: 20px 24px;

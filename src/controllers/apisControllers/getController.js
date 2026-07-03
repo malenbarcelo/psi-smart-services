@@ -171,6 +171,147 @@ const getController = {
     }
   },
 
+  getPracticalExams: async(req, res) => {
+    try {
+      const filters = req.query
+      const { Op } = db.Sequelize
+
+      // build where for students_inscriptions
+      const inscriptionWhere = { enabled: 1 }
+
+      // build student filter
+      let studentWhere = {}
+      if (filters.search) {
+        const searchValue = filters.search
+        studentWhere[Op.or] = [
+          db.sequelize.where(
+            db.sequelize.fn('CONCAT', db.sequelize.col('student_data.first_name'), ' ', db.sequelize.col('student_data.last_name')),
+            { [Op.like]: `%${searchValue}%` }
+          ),
+          db.sequelize.where(
+            db.sequelize.fn('CONCAT', db.sequelize.col('student_data.last_name'), ' ', db.sequelize.col('student_data.first_name')),
+            { [Op.like]: `%${searchValue}%` }
+          )
+        ]
+      }
+      if (filters.dni) {
+        studentWhere.dni = db.sequelize.where(
+          db.sequelize.cast(db.sequelize.col('student_data.dni'), 'CHAR'),
+          { [Op.like]: `%${filters.dni}%` }
+        )
+      }
+
+      // course filter
+      if (filters.id_courses) {
+        inscriptionWhere.id_courses = filters.id_courses
+      }
+
+      // company filter
+      let companyWhere = {}
+      if (filters.company) {
+        companyWhere.company_name = { [Op.like]: `%${filters.company}%` }
+      }
+
+      const hasStudentFilter = Object.keys(studentWhere).length > 0 || Object.getOwnPropertySymbols(studentWhere).length > 0
+      const hasCompanyFilter = Object.keys(companyWhere).length > 0
+
+      // build order
+      const allowedSortFields = ['id', 'student_name', 'course', 'company']
+      let order = [['id', 'DESC']]
+      if (filters.sortBy && allowedSortFields.includes(filters.sortBy)) {
+        const direction = filters.sortOrder === 'DESC' ? 'DESC' : 'ASC'
+        if (filters.sortBy === 'student_name') {
+          order = [[{ model: db.Students, as: 'student_data' }, 'last_name', direction]]
+        } else if (filters.sortBy === 'course') {
+          order = [[{ model: db.Courses, as: 'course_data' }, 'course_name', direction]]
+        } else if (filters.sortBy === 'company') {
+          order = [[{ model: db.Users_companies, as: 'company_data' }, 'company_name', direction]]
+        } else {
+          order = [[filters.sortBy, direction]]
+        }
+      }
+
+      // find inscriptions that have at least one practical exam not passed
+      // First get the IDs, then load full data
+      const inscriptionIds = await db.Students_inscriptions.findAll({
+        where: inscriptionWhere,
+        attributes: ['id'],
+        include: [
+          { model: db.Students, as: 'student_data', attributes: [], where: hasStudentFilter ? studentWhere : undefined, required: hasStudentFilter },
+          { model: db.Users_companies, as: 'company_data', attributes: [], where: hasCompanyFilter ? companyWhere : undefined, required: hasCompanyFilter },
+          {
+            model: db.Students_exams,
+            as: 'exams',
+            attributes: [],
+            where: { exam_type: 'practical', exam_status: { [Op.ne]: 'passed' } },
+            required: true
+          }
+        ],
+        subQuery: false,
+        raw: true
+      })
+
+      const ids = inscriptionIds.map(r => r.id)
+
+      const inscriptions = await db.Students_inscriptions.findAll({
+        where: { id: ids },
+        include: [
+          { model: db.Students, as: 'student_data' },
+          { model: db.Users_companies, as: 'company_data' },
+          { model: db.Courses, as: 'course_data' },
+          { model: db.Students_exams, as: 'exams' }
+        ],
+        order,
+        subQuery: false,
+        limit: filters.limit ? parseInt(filters.limit) : undefined,
+        offset: filters.offset ? parseInt(filters.offset) : undefined
+      })
+
+      // calculate theorical and practical status for each inscription
+      const rows = inscriptions.map(insc => {
+        const allExams = insc.exams || []
+        const theoricals = allExams.filter(e => e.exam_type === 'theorical')
+        const practicals = allExams.filter(e => e.exam_type === 'practical')
+
+        let theoricalStatus = 'pending'
+        if (theoricals.length > 0) {
+          const allPassed = theoricals.every(e => e.exam_status === 'passed')
+          const anyFailed = theoricals.some(e => e.exam_status === 'not-passed')
+          const anyStarted = theoricals.some(e => e.exam_status !== 'pending')
+          if (allPassed) theoricalStatus = 'passed'
+          else if (anyFailed) theoricalStatus = 'not-passed'
+          else if (anyStarted) theoricalStatus = 'in-progress'
+        }
+
+        let practicalStatus = 'pending'
+        if (practicals.length > 0) {
+          const allPassed = practicals.every(e => e.exam_status === 'passed')
+          const anyFailed = practicals.some(e => e.exam_status === 'not-passed')
+          const anyStarted = practicals.some(e => e.exam_status !== 'pending')
+          if (allPassed) practicalStatus = 'passed'
+          else if (anyFailed) practicalStatus = 'not-passed'
+          else if (anyStarted) practicalStatus = 'in-progress'
+        }
+
+        return {
+          ...insc.toJSON(),
+          theoricalStatus,
+          practicalStatus
+        }
+      })
+
+      // filter by theorical status if requested
+      const filteredRows = filters.theoricalStatus
+        ? rows.filter(r => r.theoricalStatus === filters.theoricalStatus)
+        : rows
+
+      return res.json({ rows: filteredRows, count: filteredRows.length })
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error getting practical exams' })
+    }
+  },
+
   getCourses: async(req, res) => {
     try {
       const filters = {}
@@ -211,6 +352,7 @@ const getController = {
       }
 
       const studentIds = students.map(s => s.id)
+      const studentPhoto = students[0].photo || null
 
       // find all active inscriptions (enabled=1, status != passed) for these students
       const inscriptions = await db.Students_inscriptions.findAll({
@@ -229,7 +371,7 @@ const getController = {
       if (inscriptions.length === 0) {
         // return student name for display
         const studentName = `${students[0].last_name}, ${students[0].first_name}`
-        return res.json({ code: 'NO_PENDING', studentName, inscriptions: [] })
+        return res.json({ code: 'NO_PENDING', studentName, studentPhoto, inscriptions: [] })
       }
 
       // for each inscription, get the exams with their course exam names
@@ -262,10 +404,107 @@ const getController = {
       }
 
       const studentName = `${students[0].last_name}, ${students[0].first_name}`
-      return res.json({ code: 'HAS_PENDING', studentName, inscriptions: results })
+      return res.json({ code: 'HAS_PENDING', studentName, studentPhoto, inscriptions: results })
     } catch(error) {
       console.log(error)
       return res.status(500).json({ error: 'Error searching exams' })
+    }
+  },
+
+  getExamsByInscription: async(req, res) => {
+    try {
+      const { inscriptionId } = req.params
+
+      const exams = await db.Students_exams.findAll({
+        where: { id_students_inscriptions: inscriptionId },
+        include: [
+          { model: db.Courses_exams, as: 'course_exam_data', attributes: ['exam_name'] }
+        ],
+        order: [['exam_index', 'ASC']]
+      })
+
+      const result = exams.map(e => ({
+        id: e.id,
+        exam_name: e.course_exam_data?.exam_name || '',
+        exam_type: e.exam_type,
+        exam_index: e.exam_index,
+        exam_status: e.exam_status,
+        exam_grade: e.exam_grade
+      }))
+
+      return res.json(result)
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error getting exams by inscription' })
+    }
+  },
+
+  getExamQuestions: async(req, res) => {
+    try {
+      const studentExamId = req.params.studentExamId
+
+      // get the student exam record with course exam data
+      const studentExam = await db.Students_exams.findByPk(studentExamId, {
+        include: [
+          { model: db.Courses_exams, as: 'course_exam_data' },
+          { model: db.Courses, as: 'course_data' }
+        ]
+      })
+      if (!studentExam) {
+        return res.status(404).json({ error: 'Exam not found' })
+      }
+
+      // get all answers for this exam (ordered by question number)
+      const answers = await db.Students_exams_answers.findAll({
+        where: { id_students_exams: studentExamId },
+        include: [
+          {
+            model: db.Courses_exams_questions,
+            as: 'question_data',
+            include: [
+              { model: db.Courses_exams_questions_types, as: 'question_type_data' },
+              { model: db.Courses_exams_questions_options, as: 'options' }
+            ]
+          }
+        ],
+        order: [[{ model: db.Courses_exams_questions, as: 'question_data' }, 'question_number', 'ASC']]
+      })
+
+      // build response
+      const questions = answers.map(answer => ({
+        answerId: answer.id,
+        questionNumber: answer.question_data.question_number,
+        question: answer.question_data.question,
+        image: answer.question_data.image,
+        inputType: answer.question_data.question_type_data.icon,
+        idsSelectedOptions: answer.ids_selected_options,
+        options: answer.question_data.options.map(opt => ({
+          id: opt.id,
+          optionReference: opt.option_reference,
+          optionText: opt.option_text
+        }))
+      }))
+
+      // get existing observations if any
+      const observation = await db.Students_inscriptions_observations.findOne({
+        where: { id_students_exams: studentExamId }
+      })
+
+      return res.json({
+        studentExamId: studentExam.id,
+        studentInscriptionId: studentExam.id_students_inscriptions,
+        examStatus: studentExam.exam_status,
+        courseName: studentExam.course_data?.course_name || '',
+        examName: studentExam.course_exam_data?.exam_name || '',
+        examVersion: studentExam.exam_version,
+        examVariant: studentExam.exam_variant,
+        totalQuestions: questions.length,
+        observations: observation?.observations || '',
+        questions
+      })
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error getting exam questions' })
     }
   },
 }

@@ -8,6 +8,9 @@
       <button class="btn btn-secondary" id="openFilterBtn">
         <i class="fa-solid fa-filter"></i> Filtros
       </button>
+      <button class="btn btn-primary" id="downloadSelectedBtn" style="display: none;">
+        <i class="fa-solid fa-download"></i> Descargar seleccionados
+      </button>
       <button class="btn btn-primary" id="createInscriptionBtn">
         <i class="fa-solid fa-plus"></i> Inscripciones
       </button>
@@ -21,21 +24,22 @@
     </button>
   </div>
 
-  <div class="table-scroll-container" id="tableScrollContainer" style="--table-height: calc(100vh - 190px)">
-    <table class="std-table results-table">
+  <div class="table-scroll-container" id="tableScrollContainer" style="--table-height: calc(100vh - 190px); overflow-x: auto;">
+    <table class="std-table results-table" style="min-width: 1500px;">
       <colgroup>
-        <col style="width: 45px">
-        <col style="width: 60px">
-        <col style="width: 140px">
+        <col style="width: 50px">
+        <col style="width: 100px">
         <col style="width: 180px">
+        <col style="width: 250px">
         <col style="width: 120px">
-        <col style="width: 180px">
-        <col style="width: 120px">
-        <col style="width: 70px">
+        <col style="width: 250px">
+        <col style="width: 100px">
+        <col style="width: 150px">
         <col style="width: 90px">
+        <col style="width: 100px">
         <col style="width: 110px">
         <col style="width: 120px">
-        <col style="width: 90px">
+        <col style="width: 150px">
       </colgroup>
       <thead>
         <tr>
@@ -45,6 +49,7 @@
           <th class="th-sortable" data-sort="course">Curso <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
           <th>Evento</th>
           <th class="th-sortable" data-sort="student_name">Apellido y Nombre <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th>DNI</th>
           <th class="th-sortable" data-sort="status">Estado <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
           <th>Nota</th>
           <th>Validez</th>

@@ -3,7 +3,7 @@
 ## Install
 
 npm init -y
-npm install express ejs method-override multer express-validator express-session bcryptjs node-fetch@2 exceljs pdfkit pdf-lib archiver sequelize-cli sequelize mysql2
+npm install express ejs method-override multer sharp qrcode express-validator express-session bcryptjs node-fetch@2 exceljs pdfkit pdf-lib archiver sequelize-cli sequelize mysql2
 
 ## Setup Sequelize
 
@@ -21,6 +21,7 @@ public/css/generalStyles.css --> company colors
 data/headerMenu.js
 data/title.js
 data/databaseConfig.js
+data/appConfig.js --> baseUrl (change to production domain)
 public/images/companyLogos.jpg
 views/partials/head.ejs --> <link rel="icon" type="image/jpg" href="/images/favicon2.jpg"/> // edit favicon name yo avoid cache (put company name)
 views/login/login.ejs --> <img src="/images/companyLogo.jpg" alt="" class="login-logo-img"> // edit alt

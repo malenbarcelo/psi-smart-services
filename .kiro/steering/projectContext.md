@@ -197,3 +197,165 @@ Ruta pública (sin auth) donde los alumnos ingresan su DNI para rendir exámenes
 | `not-passed` | Cruz roja + botón reintentar (si habilitado) | Cruz roja |
 | `pending` | Botón "Hacer examen" (si habilitado) / gris (si no) | Texto "Pendiente" |
 | `in-progress` | Botón "Continuar" (si habilitado) | Texto "En proceso" |
+
+## Rendición de Examen (vista de preguntas)
+
+### Flujo
+
+1. El alumno aprieta "Hacer examen" / "Continuar" / "Reintentar" en un examen teórico habilitado
+2. Se carga la primera pregunta del examen (o la siguiente sin responder si es in-progress)
+3. Se muestra una card con:
+   - Pregunta (texto)
+   - Imagen (si `courses_exams_questions.image` != null → se busca en `/images/examsImages/`)
+   - Opciones con el tipo de input según `courses_exams_questions_types.icon`:
+     - `radio_button` → radio buttons (una sola respuesta)
+     - `checkbox` → checkboxes (múltiples respuestas)
+   - Si el examen es in-progress y la pregunta ya fue respondida, las opciones se pre-seleccionan
+4. Botones: "Atrás" (volver a la pregunta anterior) y "Continuar" (guardar y avanzar)
+5. En la última pregunta el botón dice "Finalizar"
+
+### Guardado de respuestas
+
+- Al apretar "Continuar":
+  1. Validar que al menos una opción esté seleccionada → si no, mostrar error
+  2. Guardar en `students_exams_answers` el campo `ids_selected_options` (IDs separados por coma, sin espacios)
+  3. Si es la primera vez que guarda una respuesta en este examen → cambiar `students_exams.exam_status` a `'in-progress'`
+  4. Avanzar a la siguiente pregunta
+
+- Al apretar "Atrás":
+  - Volver a la pregunta anterior, mostrando las opciones previamente seleccionadas
+  - Si se modifica la respuesta y se aprieta "Continuar", se actualiza el registro
+
+### Datos que se guardan en `students_exams_answers`
+
+- `ids_selected_options`: cadena de IDs de opciones seleccionadas separados por coma, sin espacios
+  - Radio button: un solo ID (ej: "45")
+  - Checkbox: múltiples IDs (ej: "45,47,49")
+
+### Responsive
+
+- La vista de preguntas debe ser 100% responsive
+- La card de pregunta se adapta al ancho del dispositivo
+- Las opciones son fáciles de tocar en mobile (áreas de tap amplias)
+
+## Vista Exámenes Prácticos (/examenes-practicos)
+
+### Descripción
+
+Ruta autenticada (categorías 1, 2 y 4) donde el profesor toma los exámenes prácticos. Los alumnos rinden los teóricos desde `/examenes`, los prácticos los toma el profesor desde esta vista.
+
+### Tabla principal
+
+Muestra `students_inscriptions` que tienen al menos un `students_exams` de tipo `practical` con `exam_status` != `passed` (pending, in-progress, not-passed). Solo `enabled = 1`.
+
+Columnas:
+- ID alumno
+- Apellido y Nombre
+- DNI
+- Curso
+- Empresa
+- Estado del curso (status de students_inscriptions)
+- Acciones
+
+### Acciones
+
+1. **Lupa de detalle**: muestra el estado de todos los módulos (students_exams) del curso de esa inscripción
+2. **Completar examen**: abre popup grande con:
+   - Nombre del curso
+   - Nombre del examen práctico
+   - Todas las preguntas del práctico con sus opciones (formulario completo, no de a una)
+   - Campo "Observaciones" al final (opcional, se guarda en `students_inscriptions_observations`)
+   - La lógica de calificación es la misma que los teóricos (correctas/total vs pass_grade)
+
+### Filtros (side panel)
+
+- Apellido y Nombre
+- DNI
+- Curso
+- Empresa
+
+### Tabla students_inscriptions_observations
+
+- `id_students`: del alumno
+- `id_students_inscriptions`: de la inscripción
+- `id_students_exams`: del examen práctico
+- `observations`: texto libre (max 2500 chars), opcional
+
+### Notas
+
+- El professor completa el práctico: misma lógica que teóricos pero todo visible en un solo formulario
+- Al finalizar se calcula la nota y se actualiza `students_exams` (exam_status, exam_grade, updated_at)
+- Las observaciones se guardan en `students_inscriptions_observations`
+
+## Actualización de students_inscriptions al finalizar un examen
+
+Después de actualizar `students_exams`, se evalúan TODOS los exámenes (teóricos y prácticos) de esa inscripción:
+
+| Condición | status | grade |
+|-----------|--------|-------|
+| Todos `passed` | `passed` | Promedio de todos los grades |
+| Algún `not-passed` (sin importar pending u otros) | `not-passed` | Promedio de los que tienen grade != null |
+| Algunos `pending`, resto passed/in-progress, ningún not-passed | `in-progress` | - |
+| Todos `pending` | `pending` | - |
+
+En todos los casos se actualiza `updated_at` con la fecha de hoy.
+
+Esta lógica se ejecuta en `composedController.finalizeExam`, que se llama tanto desde `/examenes` (teóricos) como desde `/examenes-practicos`.
+
+### Aclaración importante
+
+El `status` de `students_inscriptions` representa el **estado del curso** para ese alumno, NO el estado de un examen individual. Para calcularlo se miran TODOS los `students_exams` de esa inscripción (teóricos + prácticos juntos). No importa qué tipo de examen se acaba de rendir — siempre se evalúa el conjunto completo para determinar si el alumno aprobó, desaprobó o sigue en proceso en el curso.
+
+## Generación de Certificados y Credenciales
+
+### Cuándo se genera
+
+Cuando `students_inscriptions.status` pasa a `'passed'` (después de finalizar cualquier examen):
+- Si `courses.has_certificate = 1` → genera certificado PDF
+- Si `courses.has_credential = 1` → genera credencial PDF
+- Si `students.photo = null` → NO genera nada (la foto es requisito)
+
+### Templates
+
+Los templates están en:
+- `src/views/certificatesTemplates/template1.ejs` (para preview HTML)
+- `src/views/credentialsTemplates/template1.ejs` (para preview HTML)
+
+El PDF se genera con PDFKit (programático, sin HTML). Cada curso tiene un `id_templates_certificates` en `templates_certificates` que indica qué template usar.
+
+### Estructura de `templates_certificates`
+
+- `id_courses`: FK al curso
+- `id_templates_cetificates`: ID del template a usar (1 → template1, 2 → template2, etc.)
+- `certificate_logo`: nombre del archivo en `public/templatesImages/`
+- `signature_1`: nombre del archivo en `public/templatesImages/`
+- `signature_2`: nombre del archivo (nullable) en `public/templatesImages/`
+- `course_name_in_certificate`: nombre del curso como aparece en el certificado
+- `certificate_normatives`: texto de normativas
+
+### Datos del certificado (template1)
+
+1. Tipo de examen: teórico-práctico / teórico / práctico (según `has_theorical` + `has_practical`)
+2. Fecha de hoy (dd/mm/yyyy)
+3. Código: xxxx-xxxxxxxxxx (por ahora placeholder)
+4. Logo empresa: `public/images/companyLogo.png`
+5. Nombre alumno: LAST_NAME + ' ' + FIRST_NAME (mayúsculas)
+6. DNI: student.dni
+7. Nombre curso en certificado: `template.course_name_in_certificate`
+8. Vigente hasta: fecha hoy + courses.validity_months
+9. Normativas: `template.certificate_normatives`
+10. Firma 1: `template.signature_1`
+11. Firma 2: `template.signature_2` (si != null)
+12. Logo certificado: `template.certificate_logo`
+
+### Carpetas
+
+- `public/templatesImages/` — imágenes de templates (firmas, logos)
+- `public/certificatesAndCredentials/` — PDFs generados
+- Nombre archivo: `CE {id_students_inscriptions} - {course_name} - {last_name} {first_name} (DNI {dni}).pdf`
+
+### Notas técnicas
+
+- Se usa PDFKit para generar PDFs (liviano, sin browser headless)
+- Los previews HTML (para módulo futuro de selección de template) se harán con EJS
+- `pdfkit` ya está instalado en el proyecto

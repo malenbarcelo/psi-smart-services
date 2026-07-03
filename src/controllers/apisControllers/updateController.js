@@ -1,5 +1,6 @@
 const usersQueries = require('../../dbQueries/usersQueries')
 const studentsQueries = require('../../dbQueries/studentsQueries')
+const db = require('../../../database/models')
 
 const updateController = {
   toggleUserEnabled: async(req, res) => {
@@ -120,6 +121,99 @@ const updateController = {
     } catch(error) {
       console.log(error)
       return res.status(500).json({ error: 'Error updating student' })
+    }
+  },
+
+  saveExamAnswer: async(req, res) => {
+    try {
+      const { answerId } = req.params
+      const { ids_selected_options } = req.body
+
+      if (!ids_selected_options) {
+        return res.status(400).json({ error: 'Must select at least one option' })
+      }
+
+      // get the answer to compare with correct options
+      const answer = await db.Students_exams_answers.findByPk(answerId)
+      if (!answer) {
+        return res.status(404).json({ error: 'Answer not found' })
+      }
+
+      // determine if correct: compare sets regardless of order
+      const selectedSet = ids_selected_options.split(',').sort().join(',')
+      const correctSet = answer.ids_correct_options.split(',').sort().join(',')
+      const correctAnswer = selectedSet === correctSet ? 1 : 0
+
+      const today = new Date().toISOString().split('T')[0]
+
+      // update answer with selected options, correct_answer, and updated_at
+      await db.Students_exams_answers.update(
+        { ids_selected_options, correct_answer: correctAnswer, updated_at: today },
+        { where: { id: answerId } }
+      )
+
+      // update students_exams updated_at
+      await db.Students_exams.update(
+        { updated_at: today },
+        { where: { id: answer.id_students_exams } }
+      )
+
+      // update students_inscriptions updated_at
+      await db.Students_inscriptions.update(
+        { updated_at: today },
+        { where: { id: answer.id_students_inscriptions } }
+      )
+
+      return res.json({ success: true, correctAnswer })
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error saving answer' })
+    }
+  },
+
+  updateExamStatus: async(req, res) => {
+    try {
+      const { studentExamId } = req.params
+      const { status } = req.body
+
+      const allowedStatuses = ['pending', 'in-progress', 'passed', 'not-passed']
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Invalid status' })
+      }
+
+      await db.Students_exams.update(
+        { exam_status: status },
+        { where: { id: studentExamId } }
+      )
+
+      return res.json({ success: true })
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error updating exam status' })
+    }
+  },
+
+  updateInscriptionStatus: async(req, res) => {
+    try {
+      const { inscriptionId } = req.params
+      const { status } = req.body
+
+      const allowedStatuses = ['pending', 'in-progress', 'passed', 'not-passed']
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Invalid status' })
+      }
+
+      const today = new Date().toISOString().split('T')[0]
+
+      await db.Students_inscriptions.update(
+        { status, updated_at: today },
+        { where: { id: inscriptionId } }
+      )
+
+      return res.json({ success: true })
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error updating inscription status' })
     }
   },
 }

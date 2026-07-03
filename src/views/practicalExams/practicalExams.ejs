@@ -1,0 +1,158 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<div class="page-content">
+  <div class="page-title-row">
+    <h1 class="page-title">Exámenes Prácticos</h1>
+    <div class="page-title-actions">
+      <button class="btn btn-secondary" id="openFilterBtn">
+        <i class="fa-solid fa-filter"></i> Filtros
+      </button>
+    </div>
+  </div>
+
+  <div class="active-filters-bar" id="activeFiltersBar" style="display: none;">
+    <span class="active-filters-text">Filtros aplicados</span>
+    <button class="btn-clear-filters" id="clearFiltersBtn">
+      <i class="fa-solid fa-xmark"></i> Quitar filtros
+    </button>
+  </div>
+
+  <div class="table-scroll-container" id="tableScrollContainer" style="--table-height: calc(100vh - 190px); overflow-x: auto;">
+    <table class="std-table" style="min-width: 1100px;">
+      <colgroup>
+        <col style="width: 60px">
+        <col style="width: 200px">
+        <col style="width: 160px">
+        <col style="width: 180px">
+        <col style="width: 100px">
+        <col style="width: 120px">
+        <col style="width: 120px">
+        <col style="width: 120px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="th-sortable" data-sort="id">ID <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th class="th-sortable" data-sort="course">Curso <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th class="th-sortable" data-sort="company">Empresa <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th class="th-sortable" data-sort="student_name">Apellido y Nombre <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th>DNI</th>
+          <th>Teórico</th>
+          <th>Práctico</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="practicalExamsTableBody">
+        <!-- rows loaded via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Detail Popup -->
+<div class="popup-overlay" id="detailPopup">
+  <div class="popup-card popup-md">
+    <div class="popup-header">
+      <div>
+        <h3 class="popup-title" id="detailPopupTitle" style="text-transform: uppercase;"></h3>
+        <p class="popup-subtitle" id="detailPopupSubtitle"></p>
+      </div>
+      <i class="fa-solid fa-xmark popup-close" id="detailPopupClose"></i>
+    </div>
+    <div class="popup-body" id="detailPopupBody">
+      <!-- exam modules detail loaded by JS -->
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="detailPopupCancel">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Practical Exam Popup -->
+<div class="popup-overlay" id="practicalExamPopup">
+  <div class="popup-card popup-lg">
+    <div class="popup-header">
+      <div>
+        <h3 class="popup-title" id="practicalExamPopupTitle" style="text-transform: uppercase;"></h3>
+        <p class="popup-subtitle" id="practicalExamPopupSubtitle"></p>
+      </div>
+      <i class="fa-solid fa-xmark popup-close" id="practicalExamPopupClose"></i>
+    </div>
+    <div class="popup-body" id="practicalExamPopupBody">
+      <!-- questions loaded by JS -->
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="practicalExamPopupCancel">Cancelar</button>
+      <button class="btn btn-primary" id="practicalExamPopupSave">Finalizar examen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Popup -->
+<div class="popup-overlay" id="confirmPopup">
+  <div class="popup-card popup-sm">
+    <div class="popup-header">
+      <h3 class="popup-title" id="confirmPopupTitle">Confirmar</h3>
+      <i class="fa-solid fa-xmark popup-close" id="confirmPopupClose"></i>
+    </div>
+    <div class="popup-body">
+      <p id="confirmPopupMessage">¿Está seguro?</p>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="confirmPopupCancel">Cancelar</button>
+      <button class="btn btn-danger" id="confirmPopupAccept">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Side Panel -->
+<div class="filter-panel" id="filterPanel">
+  <div class="filter-panel-header">
+    <h3 class="filter-panel-title">Filtros</h3>
+    <i class="fa-solid fa-xmark filter-panel-close" id="filterPanelClose"></i>
+  </div>
+  <div class="filter-panel-body">
+    <div class="input-group">
+      <label class="input-label">Curso</label>
+      <select class="input-field" id="filterCourse">
+        <option value="">Todos</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Empresa</label>
+      <input type="text" class="input-field" id="filterCompany" autocomplete="off" placeholder="Buscar por empresa...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Nombre / Apellido</label>
+      <input type="text" class="input-field" id="filterName" autocomplete="off" placeholder="Buscar por nombre...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">DNI</label>
+      <input type="text" class="input-field" id="filterDni" autocomplete="off" placeholder="Buscar por DNI...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Estado Teórico</label>
+      <select class="input-field" id="filterTheorical">
+        <option value="">Todos</option>
+        <option value="passed">Aprobado</option>
+        <option value="not-passed">Desaprobado</option>
+        <option value="in-progress">En proceso</option>
+        <option value="pending">Pendiente</option>
+      </select>
+    </div>
+  </div>
+  <div class="filter-panel-footer">
+    <button class="btn btn-secondary" id="filterClearBtn">Limpiar</button>
+    <button class="btn btn-primary" id="filterApplyBtn">Aplicar</button>
+  </div>
+</div>
+<div class="filter-panel-overlay" id="filterPanelOverlay"></div>
+
+<!-- Result Popup -->
+<div class="result-popup" id="resultPopup">
+  <i class="fa-solid fa-check result-popup-icon"></i>
+  <span class="result-popup-text" id="resultPopupText">Operación exitosa</span>
+</div>
+
+<!----------SCRIPTS---------->
+<script type="module" src="/js/practicalExams/practicalExams.js"></script>

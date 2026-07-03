@@ -215,8 +215,19 @@ updateSelectColors()
 
 ## Convención de búsqueda en backend
 
-- Los filtros de texto (nombre, apellido, etc.) usan un parámetro `search` que busca con `LIKE %valor%` (case insensitive) en múltiples columnas relevantes (first_name, last_name, user_name, email, etc.)
-- Los filtros exactos (categoría, empresa, estado) se envían como parámetros individuales con el nombre de la columna
+- Los filtros de texto (nombre, apellido, empresa, etc.) usan `LIKE %valor%` (case insensitive, búsqueda parcial)
+- Si el usuario escribe "uAn p" debe encontrar "Juan Perez" — la búsqueda es por substring, sin importar mayúsculas/minúsculas
+- Los filtros exactos (categoría, estado, select de curso) se envían como parámetros individuales con el valor exacto del ID/opción
 - MySQL con charset utf8mb4 y collation `utf8mb4_general_ci` ya es case insensitive por defecto con `LIKE`
 - En el dbQueries, usar `Op.like` de Sequelize para los filtros de texto
 - Nunca hacer búsqueda exacta para campos de texto libres, siempre parcial
+- Para nombre/apellido, buscar con CONCAT en ambos órdenes (nombre+apellido y apellido+nombre)
+
+## Regla obligatoria para todos los módulos
+
+Todos los `filters.js` de cada módulo DEBEN:
+1. Cerrar el panel con Escape
+2. Aplicar filtros con Enter desde cualquier input
+3. Llamar a `resetAndLoad` (o equivalente) al aplicar — no solo mostrar la barra
+4. Limpiar filtros desde el panel y desde la barra de filtros activos
+5. Seguir el mismo patrón que `users/filters.js`

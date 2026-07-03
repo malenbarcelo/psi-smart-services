@@ -1,0 +1,92 @@
+<%- include('../partials/head') %>
+
+<div class="verify-page">
+  <div class="verify-card">
+    <div class="verify-logo">
+      <img src="/images/companyLogo.jpg" alt="PSI Smart Services" class="verify-logo-img">
+    </div>
+
+    <% if (!result) { %>
+      <div class="verify-status verify-status-invalid">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <h2>Certificado no encontrado</h2>
+        <p>El código de verificación no corresponde a ningún certificado emitido.</p>
+      </div>
+    <% } else if (result.isValid) { %>
+      <div class="verify-status verify-status-valid">
+        <i class="fa-solid fa-circle-check"></i>
+        <h2>Certificado VÁLIDO</h2>
+      </div>
+      <div class="verify-data">
+        <div class="verify-row"><span class="verify-label">Alumno:</span> <span class="verify-value"><%= result.studentName %></span></div>
+        <div class="verify-row"><span class="verify-label">DNI:</span> <span class="verify-value"><%= result.dni %></span></div>
+        <div class="verify-row"><span class="verify-label">Curso:</span> <span class="verify-value"><%= result.courseName %></span></div>
+        <div class="verify-row"><span class="verify-label">Empresa:</span> <span class="verify-value"><%= result.companyName %></span></div>
+        <% if (result.expirationDate) { %>
+          <div class="verify-row"><span class="verify-label">Vigente hasta:</span> <span class="verify-value"><%= String(result.expirationDate.getDate()).padStart(2,'0') %>/<%= String(result.expirationDate.getMonth()+1).padStart(2,'0') %>/<%= result.expirationDate.getFullYear() %></span></div>
+        <% } %>
+      </div>
+    <% } else if (result.isExpired) { %>
+      <div class="verify-status verify-status-expired">
+        <i class="fa-solid fa-clock"></i>
+        <h2>Certificado VENCIDO</h2>
+      </div>
+      <div class="verify-data">
+        <div class="verify-row"><span class="verify-label">Alumno:</span> <span class="verify-value"><%= result.studentName %></span></div>
+        <div class="verify-row"><span class="verify-label">DNI:</span> <span class="verify-value"><%= result.dni %></span></div>
+        <div class="verify-row"><span class="verify-label">Curso:</span> <span class="verify-value"><%= result.courseName %></span></div>
+        <div class="verify-row"><span class="verify-label">Venció el:</span> <span class="verify-value verify-value-expired"><%= String(result.expirationDate.getDate()).padStart(2,'0') %>/<%= String(result.expirationDate.getMonth()+1).padStart(2,'0') %>/<%= result.expirationDate.getFullYear() %></span></div>
+      </div>
+    <% } else { %>
+      <div class="verify-status verify-status-invalid">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <h2>Certificado NO VÁLIDO</h2>
+        <p>Este certificado no está aprobado.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<style>
+  .verify-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f5f7;
+    padding: 20px;
+  }
+  .verify-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px 35px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  .verify-logo { margin-bottom: 24px; }
+  .verify-logo-img { height: 32px; }
+  .verify-status { margin-bottom: 20px; }
+  .verify-status i { font-size: 48px; margin-bottom: 12px; }
+  .verify-status h2 { margin: 0 0 6px; font-size: 20px; color: #4a4a4a; }
+  .verify-status p { margin: 0; font-size: 13px; color: #888; }
+  .verify-status-valid i { color: #28a745; }
+  .verify-status-valid h2 { color: #28a745; }
+  .verify-status-expired i { color: var(--color1); }
+  .verify-status-expired h2 { color: var(--color1); }
+  .verify-status-invalid i { color: var(--errorColor); }
+  .verify-status-invalid h2 { color: var(--errorColor); }
+  .verify-data { text-align: left; margin-top: 16px; }
+  .verify-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+  }
+  .verify-row:last-child { border-bottom: none; }
+  .verify-label { color: #888; font-weight: 500; }
+  .verify-value { color: #333; font-weight: 500; }
+  .verify-value-expired { color: var(--errorColor); }
+</style>

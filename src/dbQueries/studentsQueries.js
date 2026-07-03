@@ -28,9 +28,15 @@ const studentsQueries = {
       where.email = { [Op.like]: `%${filters.email}%` }
     }
 
-    // dni search (exact match)
+    // dni search (partial match)
     if (filters.dni) {
-      where.dni = filters.dni
+      where[Op.and] = [
+        ...(where[Op.and] || []),
+        db.sequelize.where(
+          db.sequelize.cast(db.sequelize.col('Students.dni'), 'CHAR'),
+          { [Op.like]: `%${filters.dni}%` }
+        )
+      ]
     }
 
     // filter by company (visibility)

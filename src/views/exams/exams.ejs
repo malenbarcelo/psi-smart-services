@@ -20,6 +20,31 @@
   </div>
 </div>
 
+<!-- Welcome / Photo Screen -->
+<div class="exams-page" id="examsWelcomeScreen" style="display: none;">
+  <div class="exams-card">
+    <div class="exams-welcome-photo-container" id="welcomePhotoContainer">
+      <img id="welcomePhoto" src="" alt="Foto del alumno" class="exams-welcome-photo" style="display: none;">
+      <div class="exams-welcome-photo-placeholder" id="welcomePhotoPlaceholder">
+        <i class="fa-solid fa-user"></i>
+      </div>
+    </div>
+    <h2 class="exams-welcome-title" id="welcomeTitle"></h2>
+    <p class="exams-welcome-subtitle" id="welcomeSubtitle"></p>
+
+    <div class="exams-welcome-upload" id="welcomeUploadSection">
+      <label class="exams-upload-btn" for="photoInput">
+        <i class="fa-solid fa-camera"></i> <span id="uploadBtnText">Subir foto</span>
+      </label>
+      <input type="file" id="photoInput" accept="image/jpeg,image/png" capture="user" style="display: none;">
+      <span class="exams-error" id="photoError"></span>
+    </div>
+
+    <button class="exams-btn" id="welcomeContinueBtn">Continuar</button>
+    <a href="/examenes" class="exams-welcome-back-link">Cancelar</a>
+  </div>
+</div>
+
 <!-- Exams List Screen -->
 <div id="examsListScreen" style="display: none;">
   <div class="header">
@@ -40,6 +65,9 @@
     </div>
   </div>
   <div class="exams-list-page">
+    <div class="page-title-row" style="justify-content: center;">
+      <h1 class="page-title">Exámenes Pendientes</h1>
+    </div>
     <div class="exams-list-container" id="examsListContainer">
       <!-- cards rendered by JS -->
     </div>
@@ -58,6 +86,63 @@
       <p class="exams-no-exams-text">Todos tus exámenes están aprobados o no tenés inscripciones activas.</p>
     </div>
     <button class="exams-btn exams-btn-secondary" id="examsBackBtn">Volver</button>
+  </div>
+</div>
+
+<!-- Exam Questions Screen -->
+<div id="examsQuestionScreen" style="display: none;">
+  <div class="header">
+    <div class="top-header">
+      <div class="top-header-left">
+        <img src="/images/companyLogo.png" alt="PSI Smart Services" class="company-logo">
+      </div>
+      <div class="top-header-right">
+        <div class="user-logged">
+          <div class="user-icon-circle">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <span class="user-logged-name" id="examStudentName"></span>
+          <span class="user-logged-initials" id="examStudentInitials"></span>
+          <a href="/examenes" class="logout-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="exam-question-page">
+    <div class="exam-question-container">
+      <div class="exam-question-header-info">
+        <h2 class="exam-question-course-name" id="examCourseName"></h2>
+        <p class="exam-question-exam-name" id="examExamName"></p>
+      </div>
+      <div class="exam-question-card" id="examQuestionCard">
+        <div class="exam-question-text" id="examQuestionText"></div>
+        <div class="exam-question-image" id="examQuestionImage" style="display: none;">
+          <img id="examQuestionImg" src="" alt="Imagen de la pregunta">
+        </div>
+        <div class="exam-question-options" id="examQuestionOptions"></div>
+        <span class="exams-error" id="examOptionError" style="margin-top: 8px;"></span>
+      </div>
+      <div class="exam-question-footer">
+        <div class="exam-question-progress" id="examProgress"></div>
+        <div class="exam-question-actions">
+          <button class="exam-nav-btn exam-nav-btn-prev" id="examPrevBtn"><i class="fa-solid fa-chevron-left"></i> Atrás</button>
+          <button class="exam-nav-btn exam-nav-btn-next" id="examNextBtn">Continuar <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Exam Result Screen -->
+<div class="exams-page" id="examsResultScreen" style="display: none;">
+  <div class="exams-card">
+    <div class="exam-result-icon" id="examResultIcon"></div>
+    <h2 class="exam-result-title" id="examResultTitle"></h2>
+    <p class="exam-result-score" id="examResultScore"></p>
+    <div class="exam-result-actions">
+      <button class="exam-result-btn exam-result-btn-primary" id="examResultBackBtn"><i class="fa-solid fa-arrow-left"></i> Volver al menú</button>
+      <a href="/examenes" class="exam-result-btn exam-result-btn-secondary">Salir</a>
+    </div>
   </div>
 </div>
 

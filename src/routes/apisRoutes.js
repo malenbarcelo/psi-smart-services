@@ -9,6 +9,12 @@ const router = express.Router()
 
 // public routes (no auth required)
 router.get('/exams/search-dni/:dni', getController.searchExamsByDni)
+router.get('/exams/:studentExamId/questions', getController.getExamQuestions)
+router.get('/exams/inscription/:inscriptionId', getController.getExamsByInscription)
+router.put('/exams/answers/:answerId', updateController.saveExamAnswer)
+router.put('/exams/:studentExamId/status', updateController.updateExamStatus)
+router.put('/inscriptions/:inscriptionId/status', updateController.updateInscriptionStatus)
+router.post('/students/upload-photo', composedController.uploadStudentPhoto)
 
 // get routes
 router.get('/users', authMiddleware, getController.getUsers)
@@ -18,6 +24,7 @@ router.get('/users-companies', authMiddleware, getController.getUsersCompanies)
 router.get('/students', authMiddleware, getController.getStudents)
 router.get('/students/:id', authMiddleware, getController.getStudentById)
 router.get('/results', authMiddleware, getController.getResults)
+router.get('/practical-exams', authMiddleware, getController.getPracticalExams)
 router.get('/courses', authMiddleware, getController.getCourses)
 
 // create routes
@@ -33,5 +40,11 @@ router.put('/students/:id', authMiddleware, updateController.updateStudent)
 router.put('/students/:id/toggle-enabled', authMiddleware, updateController.toggleStudentEnabled)
 
 // composed routes
+router.post('/exams/:studentExamId/finalize', composedController.finalizeExam)
+router.post('/exams/:studentExamId/preview', composedController.previewExam)
+router.post('/inscriptions/observations', createController.createObservation)
+
+// test route (remove in production)
+router.get('/test-certificate/:inscriptionId', composedController.testCertificate)
 
 module.exports = router

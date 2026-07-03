@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1
+    },
+    verification_token: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
     }
   }
 
@@ -55,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
     Students_inscriptions.belongsTo(models.Students, { as: 'student_data', foreignKey: 'id_students' })
     Students_inscriptions.belongsTo(models.Courses, { as: 'course_data', foreignKey: 'id_courses' })
     Students_inscriptions.hasMany(models.Students_exams, { as: 'exams', foreignKey: 'id_students_inscriptions' })
-    Students_inscriptions.hasMany(models.Students_exams_theoricals, { as: 'exams_theoricals', foreignKey: 'id_students_inscriptions' })
+    Students_inscriptions.hasMany(models.Students_inscriptions_observations, { as: 'observations', foreignKey: 'id_students_inscriptions' })
   }
 
   return Students_inscriptions
