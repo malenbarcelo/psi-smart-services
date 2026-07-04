@@ -17,6 +17,7 @@ router.get('/usuarios', authMiddleware, routeAccessMiddleware, appController.use
 router.get('/alumnos', authMiddleware, routeAccessMiddleware, appController.students)
 router.get('/resultados', authMiddleware, routeAccessMiddleware, appController.results)
 router.get('/examenes-practicos', authMiddleware, routeAccessMiddleware, appController.practicalExams)
+router.get('/cursos', authMiddleware, routeAccessMiddleware, appController.courses)
 router.get('/examenes', appController.exams)
 router.get('/verificar/:token', appController.verifyCertificate)
 

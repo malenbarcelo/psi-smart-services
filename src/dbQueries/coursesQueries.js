@@ -5,7 +5,7 @@ const { Op } = require('sequelize')
 const model = db.Courses
 
 const coursesQueries = {
-  get: async({ filters = {}, pagination = {} } = {}) => {
+  get: async({ filters = {}, pagination = {}, sort = {} } = {}) => {
     const where = {}
 
     // text search (partial match on course name)
@@ -40,7 +40,7 @@ const coursesQueries = {
 
     const options = {
       where,
-      order: [['course_name', 'ASC']]
+      order: sort.sortBy ? [[sort.sortBy, sort.sortOrder || 'ASC']] : [['course_name', 'ASC']]
     }
 
     if (pagination.limit) {

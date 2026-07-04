@@ -100,6 +100,18 @@ const appController = {
     }
   },
 
+  courses: async(req, res) => {
+    try {
+      const userLogged = req.session.userLogged
+      const bottomHeaderMenu = headerMenu.find(h => h.idUsersCategories == userLogged.id_users_categories)?.menu || []
+      const selectedItem = 'CURSOS'
+      return res.render('courses/courses', { title, headerMenu, bottomHeaderMenu, selectedItem, userLogged })
+    } catch(error) {
+      console.log(error)
+      return res.send('Ha ocurrido un error')
+    }
+  },
+
   exams: async(req, res) => {
     try {
       return res.render('exams/exams', { title })
@@ -115,6 +127,7 @@ const appController = {
       const dbModels = require('../../database/models')
 
       const { token } = req.params
+      const docType = req.query.type === 'credential' ? 'credential' : 'certificate'
       const inscription = await dbModels.Students_inscriptions.findOne({
         where: { verification_token: token },
         include: [
@@ -125,7 +138,7 @@ const appController = {
       })
 
       if (!inscription) {
-        return res.render('verify/verify', { title, result: null })
+        return res.render('verify/verify', { title, result: null, docType })
       }
 
       // calculate expiration
@@ -139,10 +152,10 @@ const appController = {
       }
 
       const result = {
-        studentName: `${inscription.student_data.last_name} ${inscription.student_data.first_name}`,
+        studentName: `${inscription.student_data.last_name} ${inscription.student_data.first_name}`.toUpperCase(),
         dni: inscription.student_data.dni,
-        courseName: inscription.course_data.course_name,
-        companyName: inscription.company_data?.company_name || '',
+        courseName: inscription.course_data.course_name.toUpperCase(),
+        companyName: (inscription.company_data?.company_name || '').toUpperCase(),
         status: inscription.status,
         inscriptionDate: inscription.inscription_date,
         expirationDate,
@@ -150,7 +163,7 @@ const appController = {
         isValid: inscription.status === 'passed' && !isExpired
       }
 
-      return res.render('verify/verify', { title, result })
+      return res.render('verify/verify', { title, result, docType })
     } catch(error) {
       console.log(error)
       return res.send('Ha ocurrido un error')

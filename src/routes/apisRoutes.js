@@ -46,5 +46,6 @@ router.post('/inscriptions/observations', createController.createObservation)
 
 // test route (remove in production)
 router.get('/test-certificate/:inscriptionId', composedController.testCertificate)
+router.get('/test-credential/:inscriptionId', composedController.testCredential)
 
 module.exports = router

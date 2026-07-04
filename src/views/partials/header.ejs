@@ -35,13 +35,19 @@
             <% bottomHeaderMenu.forEach(itemMenu => { %>
                 <% if (itemMenu.subitems.length === 0) { %>
                     <a href="<%= itemMenu.href %>" class="side-menu-item <%= locals.selectedItem == itemMenu.name ? 'smi-selected' : '' %>">
-                        <%= itemMenu.name %>
+                        <span class="side-menu-item-content">
+                            <span class="material-symbols-outlined side-menu-icon"><%= itemMenu.icon %></span>
+                            <span class="side-menu-item-text"><%= itemMenu.name %></span>
+                        </span>
                     </a>
                 <% } else { %>
                     <% const hasSelectedSubitem = itemMenu.subitems.some(s => locals.selectedSubitem == s.name) %>
                     <div class="side-menu-expandable-wrapper">
                         <div class="side-menu-item side-menu-expandable <%= hasSelectedSubitem ? 'smi-selected' : '' %>">
-                            <span><%= itemMenu.name %></span>
+                            <span class="side-menu-item-content">
+                                <span class="material-symbols-outlined side-menu-icon"><%= itemMenu.icon %></span>
+                                <span class="side-menu-item-text"><%= itemMenu.name %></span>
+                            </span>
                             <i class="fa-solid fa-chevron-down side-menu-chevron"></i>
                         </div>
                         <div class="side-menu-subitems <%= hasSelectedSubitem ? 'subitems-visible' : '' %>">

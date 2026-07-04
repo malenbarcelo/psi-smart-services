@@ -4,6 +4,7 @@ const sharp = require('sharp')
 const path = require('path')
 const fs = require('fs')
 const { generateCertificate } = require('../../utils/certificateGenerator')
+const { generateCredential } = require('../../utils/credentialGenerator')
 
 // multer config - store in memory for processing with sharp
 const upload = multer({
@@ -128,13 +129,19 @@ const composedController = {
         { where: { id: studentExam.id_students_inscriptions } }
       )
 
-      // generate certificate if inscription passed
+      // generate certificate and credential if inscription passed
       let certificateFile = null
+      let credentialFile = null
       if (inscriptionStatus === 'passed') {
         try {
           certificateFile = await generateCertificate(studentExam.id_students_inscriptions)
         } catch (certError) {
           console.log('Error generating certificate:', certError)
+        }
+        try {
+          credentialFile = await generateCredential(studentExam.id_students_inscriptions)
+        } catch (credError) {
+          console.log('Error generating credential:', credError)
         }
       }
 
@@ -212,6 +219,33 @@ const composedController = {
     } catch(error) {
       console.log(error)
       return res.status(500).json({ error: 'Error generating test certificate', details: error.message })
+    }
+  },
+
+  testCredential: async(req, res) => {
+    try {
+      const { inscriptionId } = req.params
+      
+      // debug: check what we're looking for
+      const inscription = await db.Students_inscriptions.findByPk(parseInt(inscriptionId), {
+        include: [{ model: db.Courses, as: 'course_data' }]
+      })
+      if (inscription) {
+        const template = await db.Templates_credentials.findOne({
+          where: { id_courses: inscription.id_courses }
+        })
+        console.log('Credential debug - id_courses:', inscription.id_courses, 'template found:', !!template)
+      }
+
+      const fileName = await generateCredential(parseInt(inscriptionId), true)
+      if (fileName) {
+        return res.json({ success: true, fileName })
+      } else {
+        return res.json({ success: false, message: 'Credential not generated (check template exists for this course)' })
+      }
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error generating test credential', details: error.message })
     }
   }
 }

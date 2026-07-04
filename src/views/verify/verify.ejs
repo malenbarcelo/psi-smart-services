@@ -9,13 +9,13 @@
     <% if (!result) { %>
       <div class="verify-status verify-status-invalid">
         <i class="fa-solid fa-circle-xmark"></i>
-        <h2>Certificado no encontrado</h2>
-        <p>El código de verificación no corresponde a ningún certificado emitido.</p>
+        <h2><%= docType === 'credential' ? 'Credencial no encontrada' : 'Certificado no encontrado' %></h2>
+        <p>El código de verificación no corresponde a ningún <%= docType === 'credential' ? 'credencial emitida' : 'certificado emitido' %>.</p>
       </div>
     <% } else if (result.isValid) { %>
       <div class="verify-status verify-status-valid">
         <i class="fa-solid fa-circle-check"></i>
-        <h2>Certificado VÁLIDO</h2>
+        <h2><%= docType === 'credential' ? 'Credencial VÁLIDA' : 'Certificado VÁLIDO' %></h2>
       </div>
       <div class="verify-data">
         <div class="verify-row"><span class="verify-label">Alumno:</span> <span class="verify-value"><%= result.studentName %></span></div>
@@ -29,7 +29,7 @@
     <% } else if (result.isExpired) { %>
       <div class="verify-status verify-status-expired">
         <i class="fa-solid fa-clock"></i>
-        <h2>Certificado VENCIDO</h2>
+        <h2><%= docType === 'credential' ? 'Credencial VENCIDA' : 'Certificado VENCIDO' %></h2>
       </div>
       <div class="verify-data">
         <div class="verify-row"><span class="verify-label">Alumno:</span> <span class="verify-value"><%= result.studentName %></span></div>
@@ -40,8 +40,8 @@
     <% } else { %>
       <div class="verify-status verify-status-invalid">
         <i class="fa-solid fa-circle-xmark"></i>
-        <h2>Certificado NO VÁLIDO</h2>
-        <p>Este certificado no está aprobado.</p>
+        <h2><%= docType === 'credential' ? 'Credencial NO VÁLIDA' : 'Certificado NO VÁLIDO' %></h2>
+        <p>Este <%= docType === 'credential' ? 'credencial' : 'certificado' %> no está aprobado.</p>
       </div>
     <% } %>
   </div>

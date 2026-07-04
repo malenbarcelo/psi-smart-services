@@ -316,6 +316,7 @@ const getController = {
     try {
       const filters = {}
       const pagination = {}
+      const sort = {}
 
       if (req.query.search) filters.search = req.query.search
       if (req.query.enabled !== undefined && req.query.enabled !== '') {
@@ -325,9 +326,37 @@ const getController = {
         pagination.limit = parseInt(req.query.limit)
         pagination.offset = parseInt(req.query.offset) || 0
       }
+      if (req.query.sortBy) {
+        sort.sortBy = req.query.sortBy
+        sort.sortOrder = req.query.sortOrder || 'ASC'
+      }
 
-      const courses = await coursesQueries.get({ filters, pagination })
-      return res.json(courses)
+      const courses = await coursesQueries.get({ filters, pagination, sort })
+
+      // check which courses have templates configured
+      const courseIds = courses.rows.map(c => c.id)
+      const certificateTemplates = await db.Templates_certificates.findAll({
+        where: { id_courses: courseIds },
+        attributes: ['id_courses'],
+        raw: true
+      })
+      const credentialTemplates = await db.Templates_credentials.findAll({
+        where: { id_courses: courseIds },
+        attributes: ['id_courses'],
+        raw: true
+      })
+
+      const certCourseIds = new Set(certificateTemplates.map(t => t.id_courses))
+      const credCourseIds = new Set(credentialTemplates.map(t => t.id_courses))
+
+      const rows = courses.rows.map(c => {
+        const course = c.toJSON ? c.toJSON() : c
+        course.hasCertificateTemplate = certCourseIds.has(course.id)
+        course.hasCredentialTemplate = credCourseIds.has(course.id)
+        return course
+      })
+
+      return res.json({ rows, count: courses.count })
     } catch(error) {
       console.log(error)
       return res.status(500).json({ error: 'Error getting courses' })

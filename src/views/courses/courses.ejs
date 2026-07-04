@@ -1,0 +1,50 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<div class="page-content">
+  <div class="page-title-row">
+    <h1 class="page-title">Cursos</h1>
+    <div class="page-title-actions">
+      <button class="btn btn-primary" id="createCourseBtn">
+        <i class="fa-solid fa-plus"></i> Crear Curso
+      </button>
+    </div>
+  </div>
+
+  <div class="table-scroll-container" id="tableScrollContainer" style="--table-height: calc(100vh - 190px)">
+    <table class="std-table">
+      <colgroup>
+        <col style="width: 25%">
+        <col style="width: 15%">
+        <col style="width: 10%">
+        <col style="width: 10%">
+        <col style="width: 10%">
+        <col style="width: 10%">
+        <col style="width: 10%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="th-sortable" data-sort="course_name">Nombre del curso <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+          <th style="text-align: center;">Próximo evento</th>
+          <th style="text-align: center;">Validez (meses)</th>
+          <th style="text-align: center;">Teórico</th>
+          <th style="text-align: center;">Práctico</th>
+          <th style="text-align: center;">Certificado</th>
+          <th style="text-align: center;">Credencial</th>
+        </tr>
+      </thead>
+      <tbody id="coursesTableBody">
+        <!-- rows loaded via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Result Popup -->
+<div class="result-popup" id="resultPopup">
+  <i class="fa-solid fa-check result-popup-icon"></i>
+  <span class="result-popup-text" id="resultPopupText">Operación exitosa</span>
+</div>
+
+<!----------SCRIPTS---------->
+<script type="module" src="/js/courses/courses.js"></script>
