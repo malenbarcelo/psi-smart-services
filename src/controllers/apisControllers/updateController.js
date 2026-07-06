@@ -124,6 +124,31 @@ const updateController = {
     }
   },
 
+  updateCertificateTemplate: async(req, res) => {
+    try {
+      const { id } = req.params
+      const { id_templates_cetificates, header_logo, footer_logo, signature_1, signature_2, course_name_in_certificate, certificate_normatives, text_1, text_2, student_photo } = req.body
+
+      await db.Templates_certificates.update({
+        id_templates_cetificates: parseInt(id_templates_cetificates),
+        header_logo: header_logo || null,
+        footer_logo: footer_logo || null,
+        signature_1,
+        signature_2: signature_2 || null,
+        course_name_in_certificate,
+        certificate_normatives,
+        text_1: text_1 || null,
+        text_2: text_2 || null,
+        student_photo: student_photo || 0
+      }, { where: { id } })
+
+      return res.json({ success: true })
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error updating certificate template' })
+    }
+  },
+
   saveExamAnswer: async(req, res) => {
     try {
       const { answerId } = req.params

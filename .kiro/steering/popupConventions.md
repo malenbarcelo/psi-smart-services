@@ -54,3 +54,21 @@ popup.querySelector('.popup-card').scrollTop = 0
 ```
 
 Aplicar esto en todos los popups que tengan `overflow-y: auto` en su `.popup-card` (max-height limitado).
+
+## Limpiar errores al abrir popups
+
+Al abrir cualquier popup de formulario, SIEMPRE limpiar los errores de validación previos antes de mostrarlo. Esto se hace llamando a `gu.isValid(inputs)` con todos los inputs del formulario al inicio de la función que abre el popup.
+
+```javascript
+function openPopup() {
+  // limpiar valores
+  input1.value = ''
+  input2.value = ''
+  // limpiar errores de validación
+  gu.isValid([input1, input2])
+  // mostrar popup
+  popup.style.display = 'block'
+}
+```
+
+Nunca debe quedar un error en rojo de una interacción anterior cuando se reabre un popup.

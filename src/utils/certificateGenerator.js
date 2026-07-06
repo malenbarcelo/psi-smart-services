@@ -35,6 +35,18 @@ async function generateCertificate(inscriptionId, forceGenerate = false) {
 
   if (!template) return null
 
+  // route to the correct template generator
+  if (template.id_templates_cetificates === 2) {
+    return generateTemplate2(inscription, course, student, template, inscriptionId)
+  }
+
+  // default: template 1
+  return generateTemplate1(inscription, course, student, template, inscriptionId)
+}
+
+// ====== TEMPLATE 1 ======
+async function generateTemplate1(inscription, course, student, template, inscriptionId) {
+
   // determine exam type text
   let examTypeText = ''
   if (course.has_theorical && course.has_practical) {
@@ -135,26 +147,44 @@ async function generateCertificate(inscriptionId, forceGenerate = false) {
     doc.image(companyLogoPath, contentLeft, innerMargin + 12, { height: 45 })
   }
 
+  // Header logo (next to company logo, same height, vertically aligned)
+  if (template.header_logo) {
+    const logo2Path = path.join(templatesImgPath, template.header_logo)
+    if (fs.existsSync(logo2Path)) {
+      doc.image(logo2Path, contentLeft + 185, innerMargin + 12, { height: 45 })
+    }
+  }
+
   // Right side header text
-  const rightTextWidth = 280
+  const rightTextWidth = 320
   const rightTextX = contentRight - rightTextWidth
 
-  doc.font('Helvetica-BoldOblique')
-    .fontSize(12)
+  doc.font('Helvetica-Bold')
+    .fontSize(13)
     .fillColor('#333')
   doc.text(`Certificado de aprobación curso ${examTypeText}`, rightTextX, innerMargin + 14, { align: 'right', width: rightTextWidth })
 
   doc.font('Helvetica-Bold')
-    .fontSize(12)
+    .fontSize(13)
     .fillColor('#333')
-  doc.text(`ARGENTINA, Neuquén ${todayFormatted}`, rightTextX, innerMargin + 32, { align: 'right', width: rightTextWidth })
+  doc.text(`ARGENTINA, Neuquén ${todayFormatted}`, rightTextX, innerMargin + 34, { align: 'right', width: rightTextWidth })
 
   doc.font('Helvetica-Bold')
-    .fontSize(12)
+    .fontSize(13)
     .fillColor('#333')
-  doc.text(`Código: xxxx-xxxxxxxxxx`, rightTextX, innerMargin + 50, { align: 'right', width: rightTextWidth })
+  doc.text(`Código: xxxx-xxxxxxxxxx`, rightTextX, innerMargin + 54, { align: 'right', width: rightTextWidth })
 
   // --- MAIN CONTENT ---
+  // Student photo (if enabled, top right)
+  if (template.student_photo === 1) {
+    const studentPhotoPath = path.join(__dirname, '../../public/studentsPhotos', student.photo || '')
+    if (student.photo && fs.existsSync(studentPhotoPath)) {
+      const photoSize = 65
+      doc.image(studentPhotoPath, contentRight - photoSize, innerMargin + 80, { width: photoSize, height: photoSize, fit: [photoSize, photoSize] })
+      doc.rect(contentRight - photoSize, innerMargin + 80, photoSize, photoSize).lineWidth(0.5).stroke('#999')
+    }
+  }
+
   // Student name (bold+italic, very large, centered, uppercase)
   doc.font('Helvetica-BoldOblique')
     .fontSize(34)
@@ -164,7 +194,7 @@ async function generateCertificate(inscriptionId, forceGenerate = false) {
 
   // DNI
   doc.font('Helvetica')
-    .fontSize(16)
+    .fontSize(19)
     .fillColor('#333')
   doc.text(`DNI: ${student.dni}`, contentLeft, innerMargin + 155, { align: 'center', width: contentWidth })
 
@@ -177,16 +207,16 @@ async function generateCertificate(inscriptionId, forceGenerate = false) {
   // Expiration (italic)
   if (expirationFormatted) {
     doc.font('Helvetica-Oblique')
-      .fontSize(17)
+      .fontSize(18)
       .fillColor('#333')
     doc.text(`Vigente hasta el ${expirationFormatted}`, contentLeft, innerMargin + 285, { align: 'center', width: contentWidth })
   }
 
   // Normatives (italic, same size as vigente)
   doc.font('Helvetica-Oblique')
-    .fontSize(17)
+    .fontSize(18)
     .fillColor('#333')
-  doc.text(template.certificate_normatives, contentLeft + 20, innerMargin + 315, { align: 'center', width: contentWidth - 40 })
+  doc.text(template.certificate_normatives, contentLeft + 20, innerMargin + 325, { align: 'center', width: contentWidth - 40 })
 
   // --- FOOTER: Signatures and logo (centered horizontally) ---
   const footerY = bottomBarY - 100
@@ -213,7 +243,7 @@ async function generateCertificate(inscriptionId, forceGenerate = false) {
   }
 
   // Certificate logo
-  const logoPath = path.join(templatesImgPath, template.certificate_logo)
+  const logoPath = path.join(templatesImgPath, template.footer_logo)
   const logoX = hasSignature2 ? startX + itemWidth * 2 : startX + itemWidth
   if (fs.existsSync(logoPath)) {
     doc.image(logoPath, logoX + 10, footerY, { fit: [itemWidth - 20, itemHeight] })
@@ -221,9 +251,222 @@ async function generateCertificate(inscriptionId, forceGenerate = false) {
 
   // --- QR Code (bottom right) ---
   const qrSize = 65
-  const qrX = contentRight - qrSize - 5
+  const qrX = contentRight - qrSize + 10
   const qrY = bottomBarY - qrSize - 10
   doc.image(qrBuffer, qrX, qrY, { width: qrSize, height: qrSize })
+
+  // finalize
+  doc.end()
+
+  return new Promise((resolve, reject) => {
+    stream.on('finish', () => resolve(fileName))
+    stream.on('error', reject)
+  })
+}
+
+// ====== TEMPLATE 2 ======
+async function generateTemplate2(inscription, course, student, template, inscriptionId) {
+  // determine exam type text
+  let examTypeText = ''
+  if (course.has_theorical && course.has_practical) {
+    examTypeText = 'teórico-práctico'
+  } else if (course.has_practical) {
+    examTypeText = 'práctico'
+  } else {
+    examTypeText = 'teórico'
+  }
+
+  // dates
+  const today = new Date()
+  const day = String(today.getDate()).padStart(2, '0')
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const year = today.getFullYear()
+  const todayFormatted = `${day}/${month}/${year}`
+
+  // month names in spanish
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  const monthText = monthNames[today.getMonth()]
+  const dayNumber = today.getDate()
+
+  // expiration date
+  let expirationFormatted = ''
+  if (course.validity_months) {
+    const expDate = new Date(today)
+    expDate.setMonth(expDate.getMonth() + course.validity_months)
+    const expDay = String(expDate.getDate()).padStart(2, '0')
+    const expMonth = String(expDate.getMonth() + 1).padStart(2, '0')
+    const expYear = expDate.getFullYear()
+    expirationFormatted = `${expDay}/${expMonth}/${expYear}`
+  }
+
+  // file name
+  const fullName = `${student.last_name} ${student.first_name}`
+  const fileName = `CE ${inscriptionId} - ${course.course_name} - ${fullName} (DNI ${student.dni}).pdf`
+  const outputPath = path.join(__dirname, '../../public/certificatesAndCredentials', fileName)
+
+  // generate verification token and save it
+  const verificationToken = crypto.randomUUID()
+  await db.Students_inscriptions.update(
+    { verification_token: verificationToken },
+    { where: { id: inscriptionId } }
+  )
+
+  // generate QR code
+  const verificationUrl = `${appConfig.baseUrl}/verificar/${verificationToken}`
+  const qrBuffer = await QRCode.toBuffer(verificationUrl, { width: 100, margin: 1 })
+
+  // image paths
+  const templatesImgPath = path.join(__dirname, '../../public/images/templatesImages')
+  const companyLogoPath = path.join(__dirname, '../../public/images/companyLogo.png')
+  const studentPhotoPath = path.join(__dirname, '../../public/studentsPhotos', student.photo || '')
+
+  // create PDF (landscape A4)
+  const doc = new PDFDocument({ size: 'A4', layout: 'landscape', margin: 0 })
+  doc.info.Title = `Certificado - ${fullName}`
+  const stream = fs.createWriteStream(outputPath)
+  doc.pipe(stream)
+
+  const pageWidth = doc.page.width
+  const pageHeight = doc.page.height
+
+  // --- WHITE BACKGROUND ---
+  doc.rect(0, 0, pageWidth, pageHeight).fill('#ffffff')
+
+  // --- OUTER FRAME: grey with shadow/relief effect ---
+  const frameMargin = 25
+  doc.rect(frameMargin + 3, frameMargin + 3, pageWidth - frameMargin * 2, pageHeight - frameMargin * 2).fill('#d0d0d0')
+  doc.rect(frameMargin, frameMargin, pageWidth - frameMargin * 2, pageHeight - frameMargin * 2).fill('#e8e8e8')
+  const innerMargin = frameMargin + 6
+  doc.rect(innerMargin, innerMargin, pageWidth - innerMargin * 2, pageHeight - innerMargin * 2).fill('#ffffff')
+
+  // --- ORANGE BARS ---
+  const barWidth = 7
+  doc.rect(innerMargin, innerMargin, barWidth, pageHeight - innerMargin * 2).fill('#FF6501')
+  const bottomBarY = pageHeight - innerMargin - barWidth
+  doc.rect(innerMargin, bottomBarY, pageWidth - innerMargin * 2, barWidth).fill('#FF6501')
+
+  // triangle
+  const triSize = 18
+  doc.save()
+  doc.moveTo(innerMargin + barWidth, bottomBarY)
+    .lineTo(innerMargin + barWidth + triSize, bottomBarY)
+    .lineTo(innerMargin + barWidth, bottomBarY - triSize)
+    .closePath()
+    .fill('#FF6501')
+  doc.restore()
+
+  // --- CONTENT AREA ---
+  const contentLeft = innerMargin + barWidth + 20
+  const contentRight = pageWidth - innerMargin - 20
+  const contentWidth = contentRight - contentLeft
+
+  // --- HEADER ---
+  if (fs.existsSync(companyLogoPath)) {
+    doc.image(companyLogoPath, contentLeft, innerMargin + 12, { height: 45 })
+  }
+
+  // Header logo (next to company logo, same height, vertically aligned)
+  if (template.header_logo) {
+    const logo2PathT2 = path.join(templatesImgPath, template.header_logo)
+    if (fs.existsSync(logo2PathT2)) {
+      doc.image(logo2PathT2, contentLeft + 185, innerMargin + 12, { height: 45 })
+    }
+  }
+
+  const rightTextWidth = 320
+  const rightTextX = contentRight - rightTextWidth
+
+  doc.font('Helvetica-Bold').fontSize(13).fillColor('#333')
+  doc.text(`Certificado de aprobación curso ${examTypeText}`, rightTextX, innerMargin + 14, { align: 'right', width: rightTextWidth })
+  doc.text(`ARGENTINA, Neuquén ${todayFormatted}`, rightTextX, innerMargin + 34, { align: 'right', width: rightTextWidth })
+  doc.text(`Código: xxxx-xxxxxxxxxx`, rightTextX, innerMargin + 54, { align: 'right', width: rightTextWidth })
+
+  // --- STUDENT PHOTO (top right, below header, if enabled) ---
+  if (template.student_photo === 1) {
+    const photoSize = 65
+    const photoX = contentRight - photoSize
+    const photoY = innerMargin + 80
+    if (student.photo && fs.existsSync(studentPhotoPath)) {
+      doc.image(studentPhotoPath, photoX, photoY, { width: photoSize, height: photoSize, fit: [photoSize, photoSize] })
+      doc.rect(photoX, photoY, photoSize, photoSize).lineWidth(0.5).stroke('#999')
+    }
+  }
+
+  // --- STUDENT NAME (bold+italic, large, centered in full width) ---
+  doc.font('Helvetica-BoldOblique').fontSize(34).fillColor('#333')
+  doc.text(fullName.toUpperCase(), contentLeft, innerMargin + 100, { align: 'center', width: contentWidth })
+
+  // DNI
+  doc.font('Helvetica').fontSize(19).fillColor('#333')
+  doc.text(`DNI: ${student.dni}`, contentLeft, innerMargin + 145, { align: 'center', width: contentWidth })
+
+  // --- COURSE TEXT: text_1 (italic) + course_name_in_certificate (bold+italic) ---
+  const text1 = template.text_1 || ''
+  const courseNameCert = template.course_name_in_certificate.toUpperCase()
+
+  // calculate total width to center manually
+  doc.font('Helvetica-Oblique').fontSize(16)
+  const text1W = doc.widthOfString(text1 + ' ')
+  doc.font('Helvetica-BoldOblique').fontSize(16)
+  const courseW = doc.widthOfString(courseNameCert)
+  const totalTextW = text1W + courseW
+  const startTextX = contentLeft + (contentWidth - totalTextW) / 2
+
+  doc.font('Helvetica-Oblique').fontSize(16).fillColor('#333')
+  doc.text(text1 + ' ', startTextX, innerMargin + 200, { continued: true, lineBreak: false })
+  doc.font('Helvetica-BoldOblique').fontSize(16)
+  doc.text(courseNameCert)
+
+  // --- EXPIRATION ---
+  if (expirationFormatted) {
+    doc.font('Helvetica-Oblique').fontSize(16).fillColor('#333')
+    doc.text(`Vigente hasta el ${expirationFormatted}`, contentLeft, innerMargin + 237, { align: 'center', width: contentWidth })
+  }
+
+  // --- NORMATIVES ---
+  doc.font('Helvetica-Oblique').fontSize(16).fillColor('#333')
+  doc.text(template.certificate_normatives, contentLeft + 20, innerMargin + 274, { align: 'center', width: contentWidth - 40 })
+
+  // --- TEXT_2 (date + text_2, italic, same style as above) ---
+  if (template.text_2) {
+    const dateText = `El día ${dayNumber} de ${monthText} de ${year}, `
+    const fullText2 = dateText + template.text_2
+    doc.font('Helvetica-Oblique').fontSize(16).fillColor('#333')
+    doc.text(fullText2, contentLeft + 20, innerMargin + 331, { align: 'center', width: contentWidth - 40 })
+  }
+
+  // --- FOOTER: Signatures and logo (aligned vertically, same height) ---
+  const footerY = bottomBarY - 100
+  const hasSignature2 = template.signature_2 != null && template.signature_2 !== ''
+  const itemCount = hasSignature2 ? 3 : 2
+  const itemWidth = 170
+  const itemHeight = 84
+  const totalWidth = itemCount * itemWidth
+  const startX = contentLeft + (contentWidth - totalWidth) / 2
+
+  const sig1Path = path.join(templatesImgPath, template.signature_1)
+  if (fs.existsSync(sig1Path)) {
+    doc.image(sig1Path, startX + 10, footerY, { fit: [itemWidth - 20, itemHeight], align: 'center', valign: 'center' })
+  }
+
+  if (hasSignature2) {
+    const sig2Path = path.join(templatesImgPath, template.signature_2)
+    if (fs.existsSync(sig2Path)) {
+      doc.image(sig2Path, startX + itemWidth + 10, footerY, { fit: [itemWidth - 20, itemHeight], align: 'center', valign: 'center' })
+    }
+  }
+
+  const logoPath = path.join(templatesImgPath, template.footer_logo)
+  const logoX = hasSignature2 ? startX + itemWidth * 2 : startX + itemWidth
+  if (fs.existsSync(logoPath)) {
+    doc.image(logoPath, logoX, footerY - 5, { fit: [itemWidth, itemHeight + 15], align: 'center', valign: 'center' })
+  }
+
+  // --- QR Code (bottom right) ---
+  const qrSize = 65
+  const qrPosX = contentRight - qrSize + 10
+  const qrPosY = bottomBarY - qrSize - 10
+  doc.image(qrBuffer, qrPosX, qrPosY, { width: qrSize, height: qrSize })
 
   // finalize
   doc.end()

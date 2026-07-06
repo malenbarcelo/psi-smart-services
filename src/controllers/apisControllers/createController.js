@@ -138,6 +138,60 @@ const createController = {
     }
   },
 
+  createCourse: async(req, res) => {
+    try {
+      const { course_name, validity_months, has_theorical, has_practical, has_certificate, has_credential } = req.body
+
+      if (!course_name) {
+        return res.status(400).json({ error: 'Course name is required' })
+      }
+
+      const newCourse = await db.Courses.create({
+        course_name,
+        validity_months: validity_months || null,
+        has_theorical: has_theorical || 0,
+        has_practical: has_practical || 0,
+        has_certificate: has_certificate || 0,
+        has_credential: has_credential || 0,
+        enabled: 1
+      })
+
+      return res.status(201).json(newCourse)
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error creating course' })
+    }
+  },
+
+  createCertificateTemplate: async(req, res) => {
+    try {
+      const { id_courses, id_templates_cetificates, header_logo, footer_logo, signature_1, signature_2, course_name_in_certificate, certificate_normatives, text_1, text_2, student_photo } = req.body
+
+      if (!id_courses || !id_templates_cetificates || !signature_1 || !course_name_in_certificate || !certificate_normatives) {
+        return res.status(400).json({ error: 'Required fields missing' })
+      }
+
+      const newTemplate = await db.Templates_certificates.create({
+        id_courses: parseInt(id_courses),
+        id_templates_cetificates: parseInt(id_templates_cetificates),
+        header_logo: header_logo || null,
+        footer_logo: footer_logo || null,
+        signature_1,
+        signature_2: signature_2 || null,
+        course_name_in_certificate,
+        certificate_normatives,
+        text_1: text_1 || null,
+        text_2: text_2 || null,
+        student_photo: student_photo || 0
+      })
+
+      return res.status(201).json(newTemplate)
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error creating certificate template' })
+    }
+  },
+
   createInscription: async(req, res) => {
     try {
       const { id_companies, id_courses, dni, first_name, last_name, email } = req.body

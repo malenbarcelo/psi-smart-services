@@ -21,6 +21,33 @@ const upload = multer({
 }).single('photo')
 
 const composedController = {
+  uploadTemplateImage: async(req, res) => {
+    upload(req, res, async(err) => {
+      try {
+        if (err) {
+          return res.status(400).json({ error: err.message || 'Error uploading file' })
+        }
+
+        if (!req.file) {
+          return res.status(400).json({ error: 'No file uploaded' })
+        }
+
+        // save to templatesImages folder (keep original quality for logos/signatures)
+        const originalName = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')
+        const timestamp = Date.now()
+        const fileName = `${timestamp}_${originalName}`
+        const outputPath = path.join(__dirname, '../../../public/images/templatesImages', fileName)
+
+        fs.writeFileSync(outputPath, req.file.buffer)
+
+        return res.json({ success: true, fileName })
+      } catch(error) {
+        console.log(error)
+        return res.status(500).json({ error: 'Error uploading template image' })
+      }
+    })
+  },
+
   uploadStudentPhoto: async(req, res) => {
     upload(req, res, async(err) => {
       try {

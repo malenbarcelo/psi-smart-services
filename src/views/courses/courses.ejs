@@ -40,6 +40,160 @@
   </div>
 </div>
 
+<!-- Create Course Popup -->
+<div class="popup-overlay" id="coursePopup">
+  <div class="popup-card popup-md">
+    <div class="popup-header">
+      <h3 class="popup-title" id="coursePopupTitle">Nuevo Curso</h3>
+      <i class="fa-solid fa-xmark popup-close" id="coursePopupClose"></i>
+    </div>
+    <div class="popup-body">
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" id="courseNameLabel">Nombre del curso</label>
+          <input type="text" class="input-field" id="courseName" autocomplete="off">
+          <span class="input-error" id="courseNameError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label class="input-label" id="courseValidityLabel">Validez (meses)</label>
+            <label style="display: flex; align-items: center; column-gap: 6px; font-size: 12px; color: #666; cursor: pointer;">
+              <input type="checkbox" id="courseNoExpiration"> Sin vencimiento
+            </label>
+          </div>
+          <input type="number" class="input-field" id="courseValidity" autocomplete="off">
+          <span class="input-error" id="courseValidityError"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group" style="flex-direction: row; align-items: center; column-gap: 10px;">
+          <input type="checkbox" id="courseTheorical">
+          <label class="input-label" for="courseTheorical">Teórico</label>
+        </div>
+        <div class="input-group" style="flex-direction: row; align-items: center; column-gap: 10px;">
+          <input type="checkbox" id="courseCertificate">
+          <label class="input-label" for="courseCertificate">Incluye certificado</label>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group" style="flex-direction: row; align-items: center; column-gap: 10px;">
+          <input type="checkbox" id="coursePractical">
+          <label class="input-label" for="coursePractical">Práctico</label>
+        </div>
+        <div class="input-group" style="flex-direction: row; align-items: center; column-gap: 10px;">
+          <input type="checkbox" id="courseCredential">
+          <label class="input-label" for="courseCredential">Incluye credencial</label>
+        </div>
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="coursePopupCancel">Cancelar</button>
+      <button class="btn btn-primary" id="coursePopupSave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Certificate Template Configuration Popup -->
+<div class="popup-overlay" id="certTemplatePopup">
+  <div class="popup-card popup-lg">
+    <div class="popup-header">
+      <h3 class="popup-title" id="certTemplatePopupTitle">Configurar Certificado</h3>
+      <i class="fa-solid fa-xmark popup-close" id="certTemplatePopupClose"></i>
+    </div>
+    <div class="popup-body" id="certTemplatePopupBody">
+      <!-- Template selection as a field -->
+      <div class="input-group" style="margin-bottom: 16px;">
+        <label class="input-label" style="margin-bottom: 8px;">Template</label>
+        <div class="cert-template-cards" id="certTemplateCards">
+          <div class="cert-template-card" data-template-id="1">
+            <img src="/images/templatesImages/certificate_1_template.jpg" alt="Template 1">
+          </div>
+          <div class="cert-template-card" data-template-id="2">
+            <img src="/images/templatesImages/certificate_2_template.jpg" alt="Template 2">
+          </div>
+        </div>
+      </div>
+
+      <!-- Fields -->
+      <div class="cert-template-fields" id="certTemplateFields">
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label">Nombre del curso en certificado</label>
+            <input type="text" class="input-field" id="certCourseName" autocomplete="off">
+            <span class="input-error" id="certCourseNameError"></span>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label">Normativas</label>
+            <textarea class="input-field" id="certNormatives" rows="2"></textarea>
+            <span class="input-error" id="certNormativesError"></span>
+          </div>
+        </div>
+
+        <div class="input-row" id="certText1Row" style="display: none;">
+          <div class="input-group">
+            <label class="input-label">Texto 1 (antes del nombre del curso)</label>
+            <input type="text" class="input-field" id="certText1" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="input-row" id="certText2Row" style="display: none;">
+          <div class="input-group">
+            <label class="input-label">Texto 2 (texto adicional con fecha)</label>
+            <textarea class="input-field" id="certText2" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group" style="flex-direction: row; align-items: center; column-gap: 10px;">
+            <input type="checkbox" id="certStudentPhoto">
+            <label class="input-label" for="certStudentPhoto">Imprimir foto del alumno</label>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label">Logo pie de página</label>
+            <div class="cert-file-selector" id="certLogoSelector"></div>
+            <span class="input-error" id="certLogoError"></span>
+          </div>
+          <div class="input-group" id="certLogo2Group">
+            <label class="input-label">Logo encabezado (opcional)</label>
+            <div class="cert-file-selector" id="certLogo2Selector"></div>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label">Firma 1</label>
+            <div class="cert-file-selector" id="certSignature1Selector"></div>
+            <span class="input-error" id="certSignature1Error"></span>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Firma 2 (opcional)</label>
+            <div class="cert-file-selector" id="certSignature2Selector"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-secondary" id="certTemplatePopupCancel">Cancelar</button>
+      <button class="btn btn-primary" id="certTemplatePopupSave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Image Zoom Popup -->
+<div class="popup-overlay" id="imageZoomPopup" style="z-index: 2000;">
+  <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; cursor: zoom-out;" id="imageZoomClose">
+    <img id="imageZoomImg" src="" style="max-width: 90%; max-height: 85vh; border-radius: 10px; box-shadow: 0 8px 40px rgba(0,0,0,0.3);">
+  </div>
+</div>
+
 <!-- Result Popup -->
 <div class="result-popup" id="resultPopup">
   <i class="fa-solid fa-check result-popup-icon"></i>

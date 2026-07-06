@@ -26,12 +26,18 @@ router.get('/students/:id', authMiddleware, getController.getStudentById)
 router.get('/results', authMiddleware, getController.getResults)
 router.get('/practical-exams', authMiddleware, getController.getPracticalExams)
 router.get('/courses', authMiddleware, getController.getCourses)
+router.get('/templates-images', authMiddleware, getController.getTemplatesImages)
+router.get('/templates-certificates/:courseId', authMiddleware, getController.getCertificateTemplate)
 
 // create routes
 router.post('/users', authMiddleware, createController.createUser)
 router.post('/users-companies', authMiddleware, createController.createCompany)
 router.post('/students', authMiddleware, createController.createStudent)
 router.post('/inscriptions', authMiddleware, createController.createInscription)
+router.post('/courses', authMiddleware, createController.createCourse)
+router.post('/templates-certificates', authMiddleware, createController.createCertificateTemplate)
+router.put('/templates-certificates/:id', authMiddleware, updateController.updateCertificateTemplate)
+router.post('/templates-images/upload', authMiddleware, composedController.uploadTemplateImage)
 
 // update routes
 router.put('/users/:id', authMiddleware, updateController.updateUser)

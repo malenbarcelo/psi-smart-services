@@ -16,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    certificate_logo: {
+    header_logo: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    footer_logo: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
@@ -34,6 +38,18 @@ module.exports = (sequelize, DataTypes) => {
     },
     certificate_normatives: {
       type: DataTypes.STRING(5000),
+      allowNull: false,
+    },
+    text_1: {
+      type: DataTypes.STRING(5000),
+      allowNull: true,
+    },
+    text_2: {
+      type: DataTypes.STRING(5000),
+      allowNull: true,
+    },
+    student_photo: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     }
   }

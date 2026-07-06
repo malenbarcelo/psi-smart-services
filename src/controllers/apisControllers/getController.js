@@ -363,6 +363,34 @@ const getController = {
     }
   },
 
+  getTemplatesImages: async(req, res) => {
+    try {
+      const imagesDir = require('path').join(__dirname, '../../../public/images/templatesImages')
+      const fs = require('fs')
+      const files = fs.readdirSync(imagesDir).filter(f => {
+        const ext = f.toLowerCase().split('.').pop()
+        return ['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)
+      })
+      return res.json(files)
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error getting template images' })
+    }
+  },
+
+  getCertificateTemplate: async(req, res) => {
+    try {
+      const { courseId } = req.params
+      const template = await db.Templates_certificates.findOne({
+        where: { id_courses: courseId }
+      })
+      return res.json(template || null)
+    } catch(error) {
+      console.log(error)
+      return res.status(500).json({ error: 'Error getting certificate template' })
+    }
+  },
+
   searchExamsByDni: async(req, res) => {
     try {
       const dni = req.params.dni

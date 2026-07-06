@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 1
     },
     verification_token: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(1000),
       allowNull: true,
     }
   }

@@ -10,12 +10,12 @@ function renderCheckbox(value, field, courseId, hasTemplate) {
   let icon = ''
   if ((field === 'has_certificate' || field === 'has_credential') && value) {
     if (hasTemplate) {
-      icon = `<i class="fa-solid fa-pen-to-square btn-icon-template" data-id="${courseId}" data-field="${field}" style="cursor: pointer; color: #28a745; margin-left: 6px; font-size: 12px; vertical-align: middle;"></i>`
+      icon = `<i class="fa-solid fa-pen-to-square btn-icon-template" data-id="${courseId}" data-field="${field}" style="cursor: pointer; color: #28a745; font-size: 12px;"></i>`
     } else {
-      icon = `<i class="fa-solid fa-gear btn-icon-template" data-id="${courseId}" data-field="${field}" style="cursor: pointer; color: var(--errorColor); margin-left: 6px; font-size: 12px; vertical-align: middle;"></i>`
+      icon = `<i class="fa-solid fa-gear btn-icon-template" data-id="${courseId}" data-field="${field}" style="cursor: pointer; color: var(--errorColor); font-size: 12px;"></i>`
     }
   }
-  return `<span style="display: inline-flex; align-items: center;"><input type="checkbox" ${checked}>${icon}</span>`
+  return `<span style="display: inline-flex; align-items: center; justify-content: flex-start; width: 40px; gap: 6px;"><input type="checkbox" ${checked}>${icon}</span>`
 }
 
 function renderRows(courses) {
